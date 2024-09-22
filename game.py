@@ -25,7 +25,7 @@ NOUGHT = 'O'
 CROSS = 'X'
 EMPTY = ' '
 
-Board = list[list[str]]
+type Board = list[list[str]]
 
 #############################################################
 ############### Private functions—do not use! ###############
