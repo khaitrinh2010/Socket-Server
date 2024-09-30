@@ -33,3 +33,6 @@ def tic_tac_toe() -> None:
         # print(winner, "wins!")
     elif game_drawn:
         print("Draw!")
+
+if __name__ == "__main__":
+    tic_tac_toe()
