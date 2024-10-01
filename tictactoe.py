@@ -1,8 +1,9 @@
-import game
+from game import Game
 #comment
 
 def tic_tac_toe() -> None:
     # Modify this function in any way you like
+    game = Game()
     board = game.create_board()
     player = game.CROSS
 

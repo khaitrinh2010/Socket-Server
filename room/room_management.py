@@ -1,6 +1,9 @@
 import re
 
-def join_room(message, all_rooms, client_address_list, client_socket):
+from src.model.Room import Room
+
+
+def join_room(message, all_rooms, all_users, sock):
     if len(message) != 3:
         return "JOIN:ACKSTATUS:3"
     mode = message[0]
@@ -9,9 +12,10 @@ def join_room(message, all_rooms, client_address_list, client_socket):
         return "JOIN:ACKSTATUS:3"
     if not room_name in all_rooms:
         return "JOIN:ACKSTATUS:1"
-    if mode == "PLAYER" and len(all_rooms[room_name]["players"]) >= 2:
+    if mode == "PLAYER" and len(all_rooms[room_name].get_players()) >= 2:
         return "JOIN:ACKSTATUS:2"
-    all_rooms[room_name][mode].append(client_address_list[client_socket])
+    user_to_be_added = all_users[sock]
+    all_rooms[room_name].add_player(user_to_be_added)
     return "JOIN:ACKSTATUS:0"
 
 def create_room(message, all_rooms):
@@ -24,7 +28,8 @@ def create_room(message, all_rooms):
         return "CREATE: ACKSTATUS:1"
     if len(message) != 2:
         return "a CREATE:ACKSTATUS:4"
-    all_rooms[room_name] = {"players": [], "viewers": []}
+    room_to_add = Room(room_name, [], [])
+    all_rooms[room_name] = room_to_add
     return "CREATE:ACKSTATUS:0"
 
 
@@ -34,14 +39,14 @@ def room_list(all_rooms, message):
         return "ROOMLIST:ACKSTATUS:1"
     mode = mode.upper()
     rooms_available = []
-    for key, value in all_rooms.items():
+    for room_name, room in all_rooms.items():
         if mode == "PLAYER":
-            if value["players"] < 2:
-                rooms_available.append(key)
+            if len(room.get_players()) < 2:
+                rooms_available.append(room_name)
         elif mode == "VIEWER":
-            rooms_available.append(key)
+            rooms_available.append(room_name)
     rooms = ",".join(rooms_available)
-    return "ROOMLIST:ACKSTATUS:0:ROOMLIST:ACKSTATUS:0:" + rooms
+    return "ROOMLIST:ACKSTATUS:0:" + rooms
 
 def is_valid_room(room_name):
     return re.match(r'^[a-zA-Z0-9_-]{1, 20}$', room_name)

@@ -7,18 +7,15 @@ import select
 from src.authen.user_management import handle_authentication_message
 from src.room.room_command_selection import handle_room_message
 
-ALL_USERS = []
-ROOMS = {}
-IS_AUTHENTICATED = False
-def is_authenticated():
-
+USERS = {} # MAP EACH SOCKET TO A USER OBJECT
+ROOMS = {} # MAP EACH ROOM NAME TO A ROOM OBJECT
 
 def handle_client_message(message, path, sock, clients) -> str:
     components = message.split(":")
     if components[0] == "LOGIN" or components[0] == "REGISTER":
-        return handle_authentication_message(message, path, clients, sock)
+        return handle_authentication_message(message, path, sock, USERS)
     elif components[0] in ["ROOMLIST", "JOIN", "CREATE"]:
-        return handle_room_message(message, ROOMS, clients, sock)
+        return handle_room_message(message, ROOMS, USERS, sock)
 
 
 def init_server(host, port, path):
@@ -46,7 +43,7 @@ def init_server(host, port, path):
                 client_socket, client_address = server.accept()
                 client_socket.setblocking(False) # client won't block the server while waiting for it to send data
                 socket_list.append(client_socket)
-                clients[client_socket] = {"address": client_address, "authenticated": False} #Not yet authenticated
+                clients[client_socket] = client_address #Not yet authenticated
             else: #CLIENT SOCKET
                 #client socket is in server side, used for communication with the client
                 try:
