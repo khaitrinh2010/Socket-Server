@@ -1,14 +1,25 @@
 import sys
 import socket
+from pickle import FALSE
+
 import select
 
 from src.authen.user_management import handle_authentication_message
+from src.room.room_command_selection import handle_room_message
+
+ALL_USERS = []
+ROOMS = {}
+IS_AUTHENTICATED = False
+def is_authenticated():
 
 
-def handle_client_message(message, path) -> str:
+def handle_client_message(message, path, sock, clients) -> str:
     components = message.split(":")
     if components[0] == "LOGIN" or components[0] == "REGISTER":
-        return handle_authentication_message(message, path)
+        return handle_authentication_message(message, path, clients, sock)
+    elif components[0] in ["ROOMLIST", "JOIN", "CREATE"]:
+        return handle_room_message(message, ROOMS, clients, sock)
+
 
 def init_server(host, port, path):
     # CREATE A SOCKET OBJECT WITH Ipv4 ADDRESS AND TCP PROTOCOL
@@ -35,14 +46,14 @@ def init_server(host, port, path):
                 client_socket, client_address = server.accept()
                 client_socket.setblocking(False) # client won't block the server while waiting for it to send data
                 socket_list.append(client_socket)
-                clients[client_socket] = client_socket
+                clients[client_socket] = {"address": client_address, "authenticated": False} #Not yet authenticated
             else: #CLIENT SOCKET
                 #client socket is in server side, used for communication with the client
                 try:
                     message = sock.recv(8192).decode('ascii')
                     if not message:
                         raise ConnectionResetError
-                    response = handle_client_message(message, path)
+                    response = handle_client_message(message, path, sock, clients)
                     sock.send(response.encode('ascii'))
                 except Exception as e:
                     socket_list.remove(sock)
