@@ -3,10 +3,10 @@ import sys
 
 import bcrypt
 
-from src.model.User import User
-
+from model.User import User
 
 def find_by_username(username, path):
+    print(username)
     # FIRST RETURN VALUE INDICATES IF THERE IS A USER IN THE DATABASE YET
     try:
         with open(path, 'r') as f:
@@ -21,7 +21,7 @@ def find_by_username(username, path):
             return user
     return None
 
-def save_user(username, password, path):
+def save_user(username, password,path):
     try:
         with open(path, 'r') as f:
             data = json.load(f)
@@ -32,17 +32,21 @@ def save_user(username, password, path):
         json.dump(data, f)
 
 def handle_login(message, path, sock, all_users):
-    username = message[0]
-    password = message[1]
+    username = message[1]
+    password = message[2]
     user = find_by_username(username, path)
     if not user:
-        return "LOGIN:ACKSTATUS:1"
+        return ("LOGIN:ACKSTATUS:1", None)
     if bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
-        foundUser = all_users[sock]
-        foundUser.set_authenticated(True)
-        return "LOGIN:ACKSTATUS:0"
+        try:
+            foundUser = all_users[username]
+            foundUser.set_authenticated(True)
+        except Exception as e:
+            print(e)
+        return ("LOGIN:ACKSTATUS:0", all_users[username])
     else:
-        return "LOGIN:ACKSTATUS:2"
+        return ("LOGIN:ACKSTATUS:2", None)
+
 
 def handle_register(message, path, sock, all_users):
     username, password = message[1], message[2]
@@ -52,7 +56,7 @@ def handle_register(message, path, sock, all_users):
     save_user(username, hashed_password, path)
 
     #CREATE AND SAVE A NEW USER
-    new_user = User(username, hashed_password, sock)
-    all_users[sock] = new_user
+    new_user = User(username, hashed_password)
+    all_users[username] = new_user
 
     return "REGISTER:ACKSTATUS:0"

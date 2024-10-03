@@ -1,4 +1,4 @@
-from game import Game
+from game_handler import Game
 #comment
 
 def tic_tac_toe() -> None:
@@ -11,7 +11,7 @@ def tic_tac_toe() -> None:
     while not game_won and not game_drawn:
         game.print_board(board)
         print()
-        # turn = "Noughts'" if player == game.NOUGHT else "Crosses'"
+        # turn = "Noughts'" if player == game_handler.NOUGHT else "Crosses'"
         # print(turn, "turn")
 
         position = game.player_turn(player, board)
@@ -30,7 +30,7 @@ def tic_tac_toe() -> None:
 
     if game_won:
         pass
-        # winner = "Noughts" if player == game.NOUGHT else "Crosses"
+        # winner = "Noughts" if player == game_handler.NOUGHT else "Crosses"
         # print(winner, "wins!")
     elif game_drawn:
         print("Draw!")

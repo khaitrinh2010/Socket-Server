@@ -1,21 +1,44 @@
+import json
 import sys
 import socket
 from pickle import FALSE
 
 import select
 
-from src.authen.user_management import handle_authentication_message
-from src.room.room_command_selection import handle_room_message
+from authen.user_management import handle_authentication_message
+from room.room_command_selection import handle_room_message
+from model.User import User
 
-USERS = {} # MAP EACH SOCKET TO A USER OBJECT
+USERS = {} # MAP EACH USERNAME TO A USER OBJECT
 ROOMS = {} # MAP EACH ROOM NAME TO A ROOM OBJECT
+SOCKET_TO_USER = {}
 
-def handle_client_message(message, path, sock, clients) -> str:
+
+def load_users_from_file(path):
+    try:
+        with open(path, 'r') as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        sys.stderr.write("File not found")
+        return None
+    if not data:
+        return None
+    for user in data:
+        USERS[user['username']] = User(user['username'], user['password'])
+
+def handle_client_message(message, path, sock:socket) -> str:
     components = message.split(":")
     if components[0] == "LOGIN" or components[0] == "REGISTER":
-        return handle_authentication_message(message, path, sock, USERS)
-    elif components[0] in ["ROOMLIST", "JOIN", "CREATE"]:
-        return handle_room_message(message, ROOMS, USERS, sock)
+        output = handle_authentication_message(message, path, sock, USERS)
+        if components[0] == "LOGIN":
+            if output[0] == "LOGIN:ACKSTATUS:0":
+                username = output[1].get_username()
+                SOCKET_TO_USER[sock] = username
+    else:
+        if not SOCKET_TO_USER.get(sock):
+            sock.send("BADAUTH".encode('ascii'))
+        if components[0] in ["ROOMLIST", "JOIN", "CREATE"]:
+            handle_room_message(message, ROOMS, USERS, SOCKET_TO_USER[sock], SOCKET_TO_USER)
 
 
 def init_server(host, port, path):
@@ -41,17 +64,17 @@ def init_server(host, port, path):
             if sock == server: #SERVER IS READY FOR LISTENING
                 #ACCEPT THE NEW CONNECTION FROM THE CLIENT AND RETURN A SOCKET TO COMMUNICATE
                 client_socket, client_address = server.accept()
-                client_socket.setblocking(False) # client won't block the server while waiting for it to send data
+                client_socket.setblocking(False) # client_side won't block the server while waiting for it to send data
                 socket_list.append(client_socket)
                 clients[client_socket] = client_address #Not yet authenticated
             else: #CLIENT SOCKET
-                #client socket is in server side, used for communication with the client
+                #client_side socket is in server side, used for communication with the client_side
                 try:
                     message = sock.recv(8192).decode('ascii')
                     if not message:
                         raise ConnectionResetError
-                    response = handle_client_message(message, path, sock, clients)
-                    sock.send(response.encode('ascii'))
+                    handle_client_message(message, path, sock)
+                    #sock.send(response.encode('ascii'))
                 except Exception as e:
                     socket_list.remove(sock)
                     del clients[sock]
@@ -61,7 +84,9 @@ def init_server(host, port, path):
 
 def main(args: list[str]) -> None:
     # Begin here!
+    load_users_from_file("DATABASE.json")
     init_server('127.0.0.1', 65432, "DATABASE.json")
+
 
 
 if __name__ == "__main__":

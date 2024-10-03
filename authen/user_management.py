@@ -1,4 +1,4 @@
-from src.authen.authentication import handle_login, handle_register
+from authen.authentication import handle_login, handle_register
 
 def handle_authentication_message(message, db_path, sock, all_users):
     message = message.split(":")

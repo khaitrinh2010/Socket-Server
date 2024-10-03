@@ -1,8 +1,8 @@
 class Room:
     def __init__(self, name, viewers, players, game):
         self.name = name
-        self.viewers = []
-        self.players = []
+        self.viewers = viewers
+        self.players = players
         self.current_turn = None
         self.game = game # EACH ROOM WILL HAVE A UNIQUE GAME INSTANCE
     def add_viewer(self, viewer):

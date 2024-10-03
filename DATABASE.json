@@ -1,1 +1,6 @@
-[]
+[
+  {"username": "quang", "password": "$2b$12$HLO/TQ3Ei5EzdiLKZScp..Grxx8x6U/TeMzOVWsV4DRtRYvHfx5Iu"},
+  {"username": "vinh", "password": "$2b$12$asw5mkxDQlB0W0t9jPf7/uyD1bXtN7X2lyNYhmotE1wGLmoW7ixU6"},
+  {"username": "Duy Anh", "password": "$2b$12$wZDgfr9gWWAWDNZwW7aCG.w.METC2MwutTGz0vFDODfvDgsMD5SiO"},
+  {"username": "Minh Quan", "password": "$2b$12$ZZ9uxMJ0ubaQBaqM4WVNS.nlh5jxGMGmm6oAsAs1y.5gG9eOjNPfu"}
+]
