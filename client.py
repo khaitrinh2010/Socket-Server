@@ -1,15 +1,73 @@
 import sys
 import socket
+import threading
 from client_side.returned_authentication_message import handle_return_login, handle_return_register
+from client_side.listen_to_server_action import handle_return_begin
 from client_side.returned_room_message import handle_returned_create, handle_returned_join, handle_returned_room_list
+from client_side.returned_game_message import handle_return_in_progress, handle_return_board_status
+USERNAME = None
+ROOM_LIST = None
+MODE = None
+ROOM_NAME = None
+WAITING_FOR_PLAYER = False  # To handle the "Waiting for other player..." state
+
+
 def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
     return client_socket
 
-def handle_outside_input(client_socket):
+
+def listen_to_message_from_server(client_socket):
+    global WAITING_FOR_PLAYER
     while True:
-        message = input("Enter message: ")
+        try:
+            response = client_socket.recv(8192).decode('ascii')
+            if not response:
+                raise ConnectionResetError
+            process_server_message(response)
+        except ConnectionResetError:
+            print("Disconnected from the server.")
+            break
+
+
+def process_server_message(response):
+    global WAITING_FOR_PLAYER
+    print("\r" + " " * 80, end="\r")
+    if response.startswith("LOGIN"):
+        print(handle_return_login(response, USERNAME))
+    elif response.startswith("REGISTER"):
+        print(handle_return_register(response, USERNAME))
+    elif response.startswith("BEGIN"):
+        print(handle_return_begin(response))
+        WAITING_FOR_PLAYER = False  # Game begins, stop waiting
+    elif response.startswith("ROOMLIST"):
+        print(handle_returned_room_list(response, MODE))
+    elif response.startswith("CREATE"):
+        if "ACKSTATUS:0" in response:
+            print(f"Successfully created room {ROOM_NAME}")
+            print("Waiting for other player...")
+            WAITING_FOR_PLAYER = True  # Waiting for second player
+        else:
+            print("Failed to create room.")
+    elif response.startswith("JOIN"):
+        print(handle_returned_join(response, ROOM_NAME, MODE))
+    elif response.startswith("INPROGRESS"):
+        print(handle_return_in_progress(response))
+    elif response.startswith("BADAUTH"):
+        print("Error: You must log in to perform this action")
+    elif response.startswith("BOARDSTATUS"):
+        print(handle_return_board_status(response))
+    else:
+        print(response)
+
+
+def handle_outside_input(client_socket):
+    global WAITING_FOR_PLAYER
+    while True:
+        if WAITING_FOR_PLAYER:
+            continue  # Don't accept input while waiting for the other player
+        message = input()
         if message == "LOGIN":
             handle_login(client_socket)
         elif message == "REGISTER":
@@ -21,55 +79,54 @@ def handle_outside_input(client_socket):
         elif message == "JOIN":
             handle_join(client_socket)
 
+
 def handle_login(client_socket):
+    global USERNAME
     username = input("Enter username: ")
     password = input("Enter password: ")
+    USERNAME = username
     client_socket.send(f"LOGIN:{username}:{password}".encode('ascii'))
-    response = client_socket.recv(8192).decode('ascii')
-    print(handle_return_login(response, username))
+
 
 def handle_register(client_socket):
+    global USERNAME
     username = input("Enter username: ")
     password = input("Enter password: ")
+    USERNAME = username
     client_socket.send(f"REGISTER:{username}:{password}".encode('ascii'))
-    response = client_socket.recv(8192).decode('ascii')
-    print(handle_return_register(response, username))
+
 
 def handle_room_list(client_socket):
-    mode = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
-    client_socket.send(f"ROOMLIST:{mode}".encode('ascii'))
-    response = client_socket.recv(8192).decode('ascii')
-    print(handle_returned_room_list(response, mode))
+    global MODE
+    MODE = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
+    client_socket.send(f"ROOMLIST:{MODE}".encode('ascii'))
+
 
 def handle_create(client_socket):
-    room_name = input("Enter room name: ")
-    client_socket.send(f"CREATE:{room_name}".encode('ascii'))
-    response = client_socket.recv(8192).decode('ascii')
-    print(handle_returned_create(response, room_name))
+    global ROOM_NAME, WAITING_FOR_PLAYER
+    ROOM_NAME = input("Enter room name: ")
+    client_socket.send(f"CREATE:{ROOM_NAME}".encode('ascii'))
+    WAITING_FOR_PLAYER = True  # Set to true when waiting for second player
+
 
 def handle_join(client_socket):
-    room_name = input("Enter room name to join: ").strip()
-    mode = input("Do you want to join as Player or Viewer? ").strip().upper()
-    client_socket.send(f"JOIN:{room_name}:{mode}".encode('ascii'))
-    response = client_socket.recv(8192).decode('ascii')
-    print(handle_returned_join(response, room_name, mode))
+    global ROOM_NAME, MODE
+    ROOM_NAME = input("Enter room name to join: ").strip()
+    MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
+    client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
-def listen_to_message_from_server(client_socket):
-    while True:
-        response = client_socket.recv(8192).decode('ascii')
-        pass
 
 def main(args: list[str]) -> None:
-    # Begin here!
-    # if len(args) != 2:
-    #     print("Expecting 2 arguments: server address and port")
-    #     return
-    # server_address = args[0]
-    # port = int(args[1])
     SERVER_ADDRESS = '127.0.0.1'
     PORT = 65432
     client_socket = connect_to_server(SERVER_ADDRESS, PORT)
+
+    listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
+    listener_thread.daemon = True
+    listener_thread.start()
+
     handle_outside_input(client_socket)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -21,7 +21,11 @@ class Room:
         return self.current_turn
     def get_next_turn(self):
         return self.players[1] if self.current_turn == self.players[0] else self.players[0]
-    def set_current_turn(self):
-        self.current_turn = self.players[0]
+    def set_current_turn(self,player):
+        self.current_turn = player
     def switch_turn(self):
         self.current_turn = self.players[1] if self.current_turn == self.players[0] else self.players[0]
+    def get_game(self):
+        return self.game
+    def set_game(self, game):
+        self.game = game

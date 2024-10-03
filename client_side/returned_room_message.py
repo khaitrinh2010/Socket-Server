@@ -6,7 +6,7 @@ def handle_returned_create(message, room_name):
         return bad_auth_msg
     status = message.split(":")[2]
     if status == "0":
-        return f"Successfully created room name {room_name}"
+        return f"Successfully created room name {room_name}\nWaiting for other players"
     elif status == "1":
         return f"Error: Room {room_name} is invalid"
     elif status == "2":

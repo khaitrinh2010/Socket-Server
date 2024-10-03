@@ -26,19 +26,17 @@ def load_users_from_file(path):
     for user in data:
         USERS[user['username']] = User(user['username'], user['password'])
 
-def handle_client_message(message, path, sock:socket) -> str:
+def handle_client_message(message, path, sock:socket):
     components = message.split(":")
     if components[0] == "LOGIN" or components[0] == "REGISTER":
-        output = handle_authentication_message(message, path, sock, USERS)
+        username = handle_authentication_message(message, path, sock, USERS)
         if components[0] == "LOGIN":
-            if output[0] == "LOGIN:ACKSTATUS:0":
-                username = output[1].get_username()
-                SOCKET_TO_USER[sock] = username
+            SOCKET_TO_USER[sock] = username
     else:
         if not SOCKET_TO_USER.get(sock):
             sock.send("BADAUTH".encode('ascii'))
         if components[0] in ["ROOMLIST", "JOIN", "CREATE"]:
-            handle_room_message(message, ROOMS, USERS, SOCKET_TO_USER[sock], SOCKET_TO_USER)
+            handle_room_message(message, ROOMS, USERS, SOCKET_TO_USER[sock], SOCKET_TO_USER, sock)
 
 
 def init_server(host, port, path):

@@ -11,10 +11,13 @@ class Game:
     ROW_SEPARATOR = '-'
     COLUMN_SEPARATOR = '|'
     N_ROW_SEPARATORS = CELL_SIZE + (CELL_SIZE - 1) * (BOARD_SIZE - 1)
+    BOARD = ""
 
     ##########################################################
     #################### Private Methods #####################
     ##########################################################
+    def __init__(self):
+        self.BOARD = self.create_board()
 
     def _player_wins_vertically(self, player: str, board: list[list[str]]) -> bool:
         return any(
@@ -63,14 +66,14 @@ class Game:
         """Create a new board"""
         return [[self.EMPTY for _ in range(self.BOARD_SIZE)] for _ in range(self.BOARD_SIZE)]
 
-    def print_board(self, board: list[list[str]]) -> None:
-        """Print the board"""
-        print(self.ROW_SEPARATOR * self.N_ROW_SEPARATORS)
+    def get_board(self, board: list[list[str]]) -> str:
+        """Return the board as a formatted string instead of printing"""
+        output = [self.ROW_SEPARATOR * self.N_ROW_SEPARATORS]
         for row in board:
-            for value in row:
-                print(f"{self.COLUMN_SEPARATOR} {value} ", end='')
-            print(self.COLUMN_SEPARATOR)
-            print(self.ROW_SEPARATOR * self.N_ROW_SEPARATORS)
+            row_str = self.COLUMN_SEPARATOR.join(f" {value} " for value in row)
+            output.append(f"{self.COLUMN_SEPARATOR}{row_str}{self.COLUMN_SEPARATOR}")
+            output.append(self.ROW_SEPARATOR * self.N_ROW_SEPARATORS)
+        return '\n'.join(output)
 
     def player_turn(self, player: str, board: list[list[str]]) -> tuple[int, int]:
         """Does a player's turn and returns the position of the turn"""
