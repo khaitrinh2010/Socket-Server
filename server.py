@@ -1,7 +1,6 @@
 import json
 import sys
 import socket
-from pickle import FALSE
 
 import select
 
