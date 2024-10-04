@@ -4,12 +4,18 @@ import threading
 from client_side.returned_authentication_message import handle_return_login, handle_return_register
 from client_side.listen_to_server_action import handle_return_begin
 from client_side.returned_room_message import handle_returned_create, handle_returned_join, handle_returned_room_list
-from client_side.returned_game_message import handle_return_in_progress, handle_return_board_status
+from client_side.returned_game_message import handle_return_in_progress, handle_return_board_status, handle_return_game_end
+
+
 USERNAME = None
 ROOM_LIST = None
 MODE = None
 ROOM_NAME = None
-WAITING_FOR_PLAYER = False  # To handle the "Waiting for other player..." state
+WAITING_FOR_PLAYER = False  #JOIN
+IS_PLAYER = False
+IS_VIEWER = False
+IS_TURN = None
+WAITING_FOR_OPPONENT = False #WAIT FOR OPPONENT TO MOVE
 
 
 def connect_to_server(host, port):
@@ -32,7 +38,7 @@ def listen_to_message_from_server(client_socket):
 
 
 def process_server_message(response):
-    global WAITING_FOR_PLAYER
+    global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
     print("\r" + " " * 80, end="\r")
     if response.startswith("LOGIN"):
         print(handle_return_login(response, USERNAME))
@@ -40,6 +46,12 @@ def process_server_message(response):
         print(handle_return_register(response, USERNAME))
     elif response.startswith("BEGIN"):
         print(handle_return_begin(response))
+        player1, player2 = response.split(":")[1], response.split(":")[2]
+        if player1 == USERNAME:
+            IS_TURN = False
+        elif player2 == USERNAME:
+            IS_TURN = True
+
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
         print(handle_returned_room_list(response, MODE))
@@ -48,9 +60,16 @@ def process_server_message(response):
             print(f"Successfully created room {ROOM_NAME}")
             print("Waiting for other player...")
             WAITING_FOR_PLAYER = True  # Waiting for second player
+            IS_PLAYER = True
         else:
             print("Failed to create room.")
     elif response.startswith("JOIN"):
+        status = response.split(":")[2]
+        if(status == "0"):
+            if MODE == "PLAYER":
+                IS_PLAYER = True
+            elif MODE == "VIEWER":
+                IS_VIEWER = True
         print(handle_returned_join(response, ROOM_NAME, MODE))
     elif response.startswith("INPROGRESS"):
         print(handle_return_in_progress(response))
@@ -58,15 +77,26 @@ def process_server_message(response):
         print("Error: You must log in to perform this action")
     elif response.startswith("BOARDSTATUS"):
         print(handle_return_board_status(response))
+        if IS_TURN != None:
+            IS_TURN = not IS_TURN
+        if IS_PLAYER and IS_TURN:
+            print("It is your turn.")
+        elif IS_PLAYER and not IS_TURN:
+            print("It is the opponent's turn.")
+    elif response.startswith("GAMEEND"):
+        print(handle_return_game_end(response, IS_PLAYER, USERNAME))
+
     else:
         print(response)
 
 
 def handle_outside_input(client_socket):
-    global WAITING_FOR_PLAYER
+    global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN
     while True:
         if WAITING_FOR_PLAYER:
             continue  # Don't accept input while waiting for the other player
+        if IS_PLAYER and not IS_TURN:
+            continue  # Don't accept input if it's not your turn
         message = input()
         if message == "LOGIN":
             handle_login(client_socket)
@@ -78,7 +108,30 @@ def handle_outside_input(client_socket):
             handle_create(client_socket)
         elif message == "JOIN":
             handle_join(client_socket)
+        elif message == "PLACE":
+            if IS_PLAYER:
+                execute_place_client(client_socket)
+                print()
+            else:
+                print("You must be a player to perform this action")
+        elif message == "FORFEIT":
+            handle_forfeit(client_socket)
 
+
+def handle_forfeit(client_socket):
+    client_socket.send("FORFEIT".encode('ascii'))
+
+def execute_place_client(client_socket):
+    col = input("Column: ")
+    row = input("Row: ")
+    while True:
+        if not col.isnumeric() or not row.isnumeric() or not(0 <= int(col) <= 2 and 0 <= int(row) <= 2):
+            print(" (Column/Row) values must be an integer between 0 and 2")
+            col = input("Column: ")
+            row = input("Row: ")
+        else:
+            break
+    client_socket.send(f"PLACE:{col}:{row}".encode('ascii'))
 
 def handle_login(client_socket):
     global USERNAME

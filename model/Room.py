@@ -29,3 +29,5 @@ class Room:
         return self.game
     def set_game(self, game):
         self.game = game
+    def is_play_first(self, player):
+        return self.players[0].get_username() == player.get_username()

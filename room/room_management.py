@@ -24,6 +24,7 @@ def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
         all_rooms[room_name].add_player(user_to_be_added)
     elif mode == "VIEWER":
         all_rooms[room_name].add_viewer(user_to_be_added)
+    all_users[username].set_room(all_rooms[room_name])
     sock.send("JOIN:ACKSTATUS:0".encode('ascii'))
     if len(all_rooms[room_name].get_players()) == 2:
         handle_begin(all_rooms, socket_to_user)
@@ -47,6 +48,7 @@ def create_room(message, all_rooms, sock, username, all_users):
     room_to_add = Room(room_name, [], [], Game())
     room_to_add.add_player(all_users[username])
     room_to_add.set_current_turn(all_users[username])
+    all_users[username].set_room(room_to_add)
     all_rooms[room_name] = room_to_add
     sock.send("CREATE:ACKSTATUS:0".encode('ascii'))
 

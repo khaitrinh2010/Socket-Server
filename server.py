@@ -7,6 +7,7 @@ import select
 
 from authen.user_management import handle_authentication_message
 from room.room_command_selection import handle_room_message
+from game_handler.game_command_selection import handle_game_command
 from model.User import User
 
 USERS = {} # MAP EACH USERNAME TO A USER OBJECT
@@ -37,6 +38,8 @@ def handle_client_message(message, path, sock:socket):
             sock.send("BADAUTH".encode('ascii'))
         if components[0] in ["ROOMLIST", "JOIN", "CREATE"]:
             handle_room_message(message, ROOMS, USERS, SOCKET_TO_USER[sock], SOCKET_TO_USER, sock)
+        elif components[0] in ["PLACE", "FORFEIT", "MOVE"]:
+            handle_game_command(message, SOCKET_TO_USER[sock], USERS, USERS[SOCKET_TO_USER[sock]].get_room().get_name(), ROOMS)
 
 
 def init_server(host, port, path):
