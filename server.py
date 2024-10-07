@@ -10,7 +10,7 @@ from game_handler.game_command_selection import handle_game_command
 from model.User import User
 
 USERS = {} # MAP EACH USERNAME TO A USER OBJECT
-ROOMS = {} # MAP EACH ROOM NAME TO A ROOM OBJECT
+ROOMS = {} # MAP EACH ROOM NAME TO A ROOM OBJECT t
 SOCKET_TO_USER = {}
 
 
