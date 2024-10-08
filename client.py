@@ -108,12 +108,12 @@ def handle_outside_input(client_socket):
             handle_create(client_socket)
         elif message == "JOIN":
             handle_join(client_socket)
-        elif message == "PLACE":
-            if IS_PLAYER:
-                execute_place_client(client_socket)
-                print()
-            else:
-                print("You must be a player to perform this action")
+        # elif message == "PLACE":
+        #     if IS_PLAYER:
+        #         execute_place_client(client_socket)
+        #         print()
+        #     else:
+        #         print("You must be a player to perform this action")
         elif message == "FORFEIT":
             handle_forfeit(client_socket)
 
