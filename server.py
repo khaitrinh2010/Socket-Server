@@ -84,7 +84,9 @@ def init_server(host, port, path):
 
 def main(args: list[str]) -> None:
     # Begin here!
-    load_users_from_file("DATABASE.json")
+    if(len(args) != 1):
+        print("Error: Expecting 1 argument: <server config path>.")
+        return
     server_config_path = args[0]
     PORT = None
     DATABASE_PATH = None
@@ -92,7 +94,7 @@ def main(args: list[str]) -> None:
         data = json.load(f)
         PORT = data['port']
         DATABASE_PATH = data['userDatabase']
-
+    load_users_from_file(DATABASE_PATH)
     init_server('127.0.0.1', PORT, DATABASE_PATH)
 
 

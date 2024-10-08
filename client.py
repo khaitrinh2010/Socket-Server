@@ -170,8 +170,8 @@ def handle_join(client_socket):
 
 
 def main(args: list[str]) -> None:
-    SERVER_ADDRESS = '127.0.0.1'
-    PORT = 65432
+    SERVER_ADDRESS = args[0]
+    PORT = args[1]
     client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
     listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
