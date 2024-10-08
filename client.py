@@ -172,7 +172,7 @@ def handle_join(client_socket):
 def main(args: list[str]) -> None:
     SERVER_ADDRESS = args[0]
     PORT = args[1]
-    client_socket = connect_to_server(SERVER_ADDRESS, PORT)
+    client_socket = connect_to_server(SERVER_ADDRESS, int(PORT))
 
     listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
     listener_thread.daemon = True
