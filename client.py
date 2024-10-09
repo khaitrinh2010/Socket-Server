@@ -113,7 +113,7 @@ def handle_outside_input(client_socket):
         #         execute_place_client(client_socket)
         #         print()
         #     else:
-        #         print("You must be a player to perform this action")
+        #         print("You must be a player to perform this action")d
         elif message == "FORFEIT":
             handle_forfeit(client_socket)
 
@@ -170,6 +170,7 @@ def handle_join(client_socket):
 
 
 def main(args: list[str]) -> None:
+    print(args)
     SERVER_ADDRESS = args[0]
     PORT = args[1]
     client_socket = connect_to_server(SERVER_ADDRESS, int(PORT))
