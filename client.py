@@ -46,8 +46,13 @@ def handle_outside_input(client_socket):
             if WAITING_FOR_PLAYER:
                 continue  # Don't accept input while waiting for the other player
             if IS_PLAYER and not IS_TURN:
-                continue  # Don't accept input if it's not your turn
-            message = input()
+                continue
+            try:
+                message = input()
+            # Don't accept input if it's not your turn
+            except EOFError:
+                print()
+                break
             if message == "LOGIN":
                 handle_login(client_socket)
             elif message == "REGISTER":
