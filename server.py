@@ -71,7 +71,7 @@ def init_server(host, port, path):
                 socket_list.remove(sock)
                 del clients[sock]
                 sock.close()  # Ensure the socket is closed
-    except KeyboardInterrupt:
+    except KeyboardInterrupt: #
         print("Server shutting down.")
     finally:
         for sock in socket_list:
