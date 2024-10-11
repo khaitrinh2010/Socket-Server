@@ -33,7 +33,7 @@ def listen_to_message_from_server(client_socket):
                     raise ConnectionResetError
                 process_server_message(response)
             except (ConnectionResetError, socket.timeout, EOFError):
-                print("Disconnected from the server.")
+                sys.stderr.write("Disconnected from the server.\n")
                 RUNNING = False
     finally:
         if client_socket:
@@ -45,13 +45,13 @@ def listen_to_message_from_server(client_socket):
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
-    print("\r" + " " * 80, end="\r")
+    sys.stdout.write("\r" + " " * 80 + "\r")
     if response.startswith("LOGIN"):
-        print(handle_return_login(response, USERNAME))
+        sys.stdout.write(handle_return_login(response, USERNAME) + "\n")
     elif response.startswith("REGISTER"):
-        print(handle_return_register(response, USERNAME))
+        sys.stdout.write(handle_return_register(response, USERNAME) + "\n")
     elif response.startswith("BEGIN"):
-        print(handle_return_begin(response))
+        sys.stdout.write(handle_return_begin(response) + "\n")
         player1, player2 = response.split(":")[1], response.split(":")[2]
         if player1 == USERNAME:
             IS_TURN = False
@@ -60,15 +60,15 @@ def process_server_message(response):
 
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
-        print(handle_returned_room_list(response, MODE))
+        sys.stdout.write(handle_returned_room_list(response, MODE) + "\n")
     elif response.startswith("CREATE"):
         if "ACKSTATUS:0" in response:
-            print(f"Successfully created room {ROOM_NAME}")
-            print("Waiting for other player...")
+            sys.stdout.write(f"Successfully created room {ROOM_NAME}\n")
+            sys.stdout.write("Waiting for other player...\n")
             WAITING_FOR_PLAYER = True  # Waiting for second player
             IS_PLAYER = True
         else:
-            print("Failed to create room.")
+            sys.stdout.write("Failed to create room.\n")
     elif response.startswith("JOIN"):
         status = response.split(":")[2]
         if status == "0":
@@ -76,23 +76,23 @@ def process_server_message(response):
                 IS_PLAYER = True
             elif MODE == "VIEWER":
                 IS_VIEWER = True
-        print(handle_returned_join(response, ROOM_NAME, MODE))
+        sys.stdout.write(handle_returned_join(response, ROOM_NAME, MODE) + "\n")
     elif response.startswith("INPROGRESS"):
-        print(handle_return_in_progress(response))
+        sys.stdout.write(handle_return_in_progress(response) + "\n")
     elif response.startswith("BADAUTH"):
-        print("Error: You must log in to perform this action")
+        sys.stdout.write("Error: You must log in to perform this action\n")
     elif response.startswith("BOARDSTATUS"):
-        print(handle_return_board_status(response))
+        sys.stdout.write(handle_return_board_status(response) + "\n")
         if IS_TURN is not None:
             IS_TURN = not IS_TURN
         if IS_PLAYER and IS_TURN:
-            print("It is your turn.")
+            sys.stdout.write("It is your turn.\n")
         elif IS_PLAYER and not IS_TURN:
-            print("It is the opponent's turn.")
+            sys.stdout.write("It is the opponent's turn.\n")
     elif response.startswith("GAMEEND"):
-        print(handle_return_game_end(response, IS_PLAYER, USERNAME))
+        sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
     else:
-        print(response)
+        sys.stdout.write(response + "\n")
 
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN, RUNNING
@@ -119,18 +119,18 @@ def handle_outside_input(client_socket):
                 handle_join(client_socket)
             elif message == "PLACE":
                 execute_place_client(client_socket)
-                print()
+                sys.stdout.write("\n")
             elif message == "FORFEIT":
                 handle_forfeit(client_socket)
     except (ConnectionResetError, socket.timeout):
-        print("Disconnected from the server.")
+        sys.stderr.write("Disconnected from the server.\n")
     finally:
         if client_socket:
             try:
                 client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
-        print("Client socket closed.")
+        sys.stdout.write("Client socket closed.\n")
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
@@ -140,7 +140,7 @@ def execute_place_client(client_socket):
     row = input("Row: ")
     while True:
         if not col.isnumeric() or not row.isnumeric() or not (0 <= int(col) <= 2 and 0 <= int(row) <= 2):
-            print(" (Column/Row) values must be an integer between 0 and 2")
+            sys.stdout.write(" (Column/Row) values must be an integer between 0 and 2\n")
             col = input("Column: ")
             row = input("Row: ")
         else:
@@ -181,7 +181,7 @@ def handle_join(client_socket):
 def main(args: list[str]) -> None:
     global client_socket
     if len(args) != 2:
-        print("Usage: python client.py <server_address> <port>")
+        sys.stderr.write("Usage: python client.py <server_address> <port>\n")
         sys.exit(1)
 
     SERVER_ADDRESS = args[0]
@@ -196,7 +196,7 @@ def main(args: list[str]) -> None:
 
         handle_outside_input(client_socket)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        sys.stderr.write(f"An error occurred: {e}\n")
         if client_socket:
             try:
                 client_socket.shutdown(socket.SHUT_RDWR)
