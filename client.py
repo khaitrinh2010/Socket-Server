@@ -203,6 +203,8 @@ def main(args: list[str]) -> None:
         handle_outside_input(client_socket)
     except Exception as e:
         print(f"An error occurred: {e}")
+        if(client_socket):
+            client_socket.shutdown(socket.SHUT_RDWR)
     finally:
         client_socket.shutdown(socket.SHUT_RDWR)
         print("Client socket closed.")
