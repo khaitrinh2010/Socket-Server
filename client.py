@@ -38,7 +38,6 @@ def listen_to_message_from_server(client_socket):
             break
 
 
-
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
     print("\r" + " " * 80, end="\r")
@@ -177,20 +176,28 @@ def handle_join(client_socket):
 
 
 def main(args: list[str]) -> None:
-    if(len(args) != 2):
+    global client_socket
+    if len(args) != 2:
         print("Usage: python client.py <server_address> <port>")
         sys.exit(1)
+
     SERVER_ADDRESS = args[0]
     PORT = int(args[1])
-    client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
-    listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
-    listener_thread.daemon = True
-    listener_thread.start()
+    try:
+        client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
-    handle_outside_input(client_socket)
+        listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
+        listener_thread.daemon = True
+        listener_thread.start()
 
-    client_socket.close()
+        handle_outside_input(client_socket)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        client_socket.close()
+        print("Client socket closed.")
+
 
 
 if __name__ == "__main__":
