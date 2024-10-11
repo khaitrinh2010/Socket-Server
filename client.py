@@ -25,23 +25,16 @@ def connect_to_server(host, port):
 
 def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER, RUNNING
-    try:
-        while RUNNING:
-            try:
-                response = client_socket.recv(8192).decode('ascii')
-                if not response:
-                    raise ConnectionResetError
-                process_server_message(response)
-            except (ConnectionResetError, socket.timeout, EOFError):
-                print("Disconnected from the server.")
-                RUNNING = False
-    finally:
-        if client_socket:
-            try:
-                client_socket.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
-            sys.exit(1)
+    while RUNNING:
+        try:
+            response = client_socket.recv(8192).decode('ascii')
+            if not response:
+                raise ConnectionResetError
+            process_server_message(response)
+        except (ConnectionResetError, socket.timeout, EOFError):
+            print("Disconnected from the server.")
+            RUNNING = False
+
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
@@ -106,7 +99,6 @@ def handle_outside_input(client_socket):
                 message = input()
             except EOFError:
                 RUNNING = False
-                sys.exit(1)
             if message == "LOGIN":
                 handle_login(client_socket)
             elif message == "REGISTER":
@@ -122,15 +114,10 @@ def handle_outside_input(client_socket):
                 print()
             elif message == "FORFEIT":
                 handle_forfeit(client_socket)
-    except (ConnectionResetError, socket.timeout):
+    except Exception as e:
         print("Disconnected from the server.")
-    finally:
-        if client_socket:
-            try:
-                client_socket.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
-        print("Client socket closed.")
+        return
+
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
