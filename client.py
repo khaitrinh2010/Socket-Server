@@ -204,7 +204,6 @@ def main(args: list[str]) -> None:
                 pass
     finally:
         client_socket.shutdown(socket.SHUT_RDWR)
-        listener_thread.
         print("Client socket closed.")
 
 if __name__ == "__main__":
