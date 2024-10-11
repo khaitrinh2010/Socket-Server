@@ -97,6 +97,5 @@ def main(args: list[str]) -> None:
     init_server('127.0.0.1', PORT, DATABASE_PATH)
 
 
-
 if __name__ == "__main__":
     main(sys.argv[1:])

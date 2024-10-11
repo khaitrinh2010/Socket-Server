@@ -39,7 +39,7 @@ def listen_to_message_from_server(client_socket):
     finally:
         if client_socket:
             try:
-                client_socket.close()
+                client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
 
@@ -129,7 +129,7 @@ def handle_outside_input(client_socket):
     finally:
         if client_socket:
             try:
-                client_socket.close()
+                client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
 
@@ -204,7 +204,7 @@ def main(args: list[str]) -> None:
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
-        client_socket.close()
+        client_socket.shutdown(socket.SHUT_RDWR)
         print("Client socket closed.")
 
 
