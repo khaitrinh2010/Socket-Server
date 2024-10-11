@@ -6,23 +6,20 @@ from client_side.listen_to_server_action import handle_return_begin
 from client_side.returned_room_message import handle_returned_create, handle_returned_join, handle_returned_room_list
 from client_side.returned_game_message import handle_return_in_progress, handle_return_board_status, handle_return_game_end
 
-
 USERNAME = None
 ROOM_LIST = None
 MODE = None
 ROOM_NAME = None
-WAITING_FOR_PLAYER = False  #JOIN
+WAITING_FOR_PLAYER = False  # JOIN
 IS_PLAYER = False
 IS_VIEWER = False
 IS_TURN = None
-WAITING_FOR_OPPONENT = False #WAIT FOR OPPONENT TO MOVE
-
+WAITING_FOR_OPPONENT = False  # WAIT FOR OPPONENT TO MOVE
 
 def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
     return client_socket
-
 
 def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER
@@ -42,7 +39,7 @@ def listen_to_message_from_server(client_socket):
                 client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
-
+        client_socket.close()
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
@@ -72,7 +69,7 @@ def process_server_message(response):
             print("Failed to create room.")
     elif response.startswith("JOIN"):
         status = response.split(":")[2]
-        if(status == "0"):
+        if status == "0":
             if MODE == "PLAYER":
                 IS_PLAYER = True
             elif MODE == "VIEWER":
@@ -84,7 +81,7 @@ def process_server_message(response):
         print("Error: You must log in to perform this action")
     elif response.startswith("BOARDSTATUS"):
         print(handle_return_board_status(response))
-        if IS_TURN != None:
+        if IS_TURN is not None:
             IS_TURN = not IS_TURN
         if IS_PLAYER and IS_TURN:
             print("It is your turn.")
@@ -92,19 +89,17 @@ def process_server_message(response):
             print("It is the opponent's turn.")
     elif response.startswith("GAMEEND"):
         print(handle_return_game_end(response, IS_PLAYER, USERNAME))
-
     else:
         print(response)
-
 
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN
     try:
         while True:
             if WAITING_FOR_PLAYER:
-                continue
+                continue  # Don't accept input while waiting for the other player
             if IS_PLAYER and not IS_TURN:
-                continue
+                continue  # Don't accept input if it's not your turn
             try:
                 message = input()
             except EOFError:
@@ -132,6 +127,8 @@ def handle_outside_input(client_socket):
                 client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
+        client_socket.close()
+        print("Client socket closed.")
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
@@ -140,7 +137,7 @@ def execute_place_client(client_socket):
     col = input("Column: ")
     row = input("Row: ")
     while True:
-        if not col.isnumeric() or not row.isnumeric() or not(0 <= int(col) <= 2 and 0 <= int(row) <= 2):
+        if not col.isnumeric() or not row.isnumeric() or not (0 <= int(col) <= 2 and 0 <= int(row) <= 2):
             print(" (Column/Row) values must be an integer between 0 and 2")
             col = input("Column: ")
             row = input("Row: ")
@@ -155,7 +152,6 @@ def handle_login(client_socket):
     USERNAME = username
     client_socket.send(f"LOGIN:{username}:{password}".encode('ascii'))
 
-
 def handle_register(client_socket):
     global USERNAME
     username = input("Enter username: ")
@@ -163,12 +159,10 @@ def handle_register(client_socket):
     USERNAME = username
     client_socket.send(f"REGISTER:{username}:{password}".encode('ascii'))
 
-
 def handle_room_list(client_socket):
     global MODE
     MODE = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
     client_socket.send(f"ROOMLIST:{MODE}".encode('ascii'))
-
 
 def handle_create(client_socket):
     global ROOM_NAME, WAITING_FOR_PLAYER
@@ -176,13 +170,11 @@ def handle_create(client_socket):
     client_socket.send(f"CREATE:{ROOM_NAME}".encode('ascii'))
     WAITING_FOR_PLAYER = True  # Set to true when waiting for second player
 
-
 def handle_join(client_socket):
     global ROOM_NAME, MODE
     ROOM_NAME = input("Enter room name to join: ").strip()
     MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
-
 
 def main(args: list[str]) -> None:
     global client_socket
@@ -203,13 +195,15 @@ def main(args: list[str]) -> None:
         handle_outside_input(client_socket)
     except Exception as e:
         print(f"An error occurred: {e}")
-        if(client_socket):
-            client_socket.shutdown(socket.SHUT_RDWR)
+        if client_socket:
+            try:
+                client_socket.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
     finally:
         client_socket.shutdown(socket.SHUT_RDWR)
+        client_socket.close()
         print("Client socket closed.")
-
-
 
 if __name__ == "__main__":
     main(sys.argv[1:])
