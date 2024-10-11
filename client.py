@@ -32,7 +32,7 @@ def listen_to_message_from_server(client_socket):
             if not response:
                 raise ConnectionResetError
             process_server_message(response)
-        except ConnectionResetError:
+        except (ConnectionResetError, EOFError):
             print("Disconnected from the server.")
             break
 
