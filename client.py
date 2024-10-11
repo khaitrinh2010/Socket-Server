@@ -15,16 +15,18 @@ IS_PLAYER = False
 IS_VIEWER = False
 IS_TURN = None
 WAITING_FOR_OPPONENT = False  # WAIT FOR OPPONENT TO MOVE
+RUNNING = True
 
 def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
+    client_socket.settimeout(8)
     return client_socket
 
 def listen_to_message_from_server(client_socket):
-    global WAITING_FOR_PLAYER
+    global WAITING_FOR_PLAYER, RUNNING
     try:
-        while True:
+        while RUNNING:
             try:
                 response = client_socket.recv(8192).decode('ascii')
                 if not response:
@@ -32,6 +34,7 @@ def listen_to_message_from_server(client_socket):
                 process_server_message(response)
             except (ConnectionResetError, socket.timeout):
                 print("Disconnected from the server.")
+                RUNNING = False
                 break
     finally:
         if client_socket:
@@ -93,9 +96,9 @@ def process_server_message(response):
         print(response)
 
 def handle_outside_input(client_socket):
-    global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN
+    global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN, RUNNING
     try:
-        while True:
+        while RUNNING:
             if WAITING_FOR_PLAYER:
                 continue  # Don't accept input while waiting for the other player
             if IS_PLAYER and not IS_TURN:
@@ -103,6 +106,7 @@ def handle_outside_input(client_socket):
             try:
                 message = input()
             except EOFError:
+                RUNNING = False
                 break
             if message == "LOGIN":
                 handle_login(client_socket)
