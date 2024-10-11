@@ -37,6 +37,7 @@ def listen_to_message_from_server(client_socket):
             break
 
 
+
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
     print("\r" + " " * 80, end="\r")
@@ -187,6 +188,8 @@ def main(args: list[str]) -> None:
     listener_thread.start()
 
     handle_outside_input(client_socket)
+
+    client_socket.close()
 
 
 if __name__ == "__main__":
