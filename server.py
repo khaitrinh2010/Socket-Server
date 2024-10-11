@@ -55,6 +55,7 @@ def init_server(host, port, path):
             for sock in read_server:
                 if sock == server:
                     client_socket, client_address = server.accept()
+                    client_socket.settimeout(8)
                     client_socket.setblocking(False)
                     socket_list.append(client_socket)
                     clients[client_socket] = client_address
@@ -74,7 +75,7 @@ def init_server(host, port, path):
                 socket_list.remove(sock)
                 del clients[sock]
                 sock.close()
-    except KeyboardInterrupt: #
+    except Exception as e: #
         print("Server shutting down.")
     finally:
         for sock in socket_list:
