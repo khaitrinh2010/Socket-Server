@@ -35,13 +35,18 @@ def listen_to_message_from_server(client_socket):
             except (ConnectionResetError, socket.timeout, EOFError):
                 sys.stderr.write("Disconnected from the server.\n")
                 RUNNING = False
+                break
     finally:
-        if client_socket:
-            try:
-                client_socket.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
-            sys.exit(1)
+        close_socket(client_socket)
+
+def close_socket(client_socket):
+    if client_socket:
+        try:
+            client_socket.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        client_socket.close()
+        sys.stdout.write("Client socket closed.\n")
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
@@ -99,14 +104,14 @@ def handle_outside_input(client_socket):
     try:
         while RUNNING:
             if WAITING_FOR_PLAYER:
-                continue  # Don't accept input while waiting for the other player
+                continue
             if IS_PLAYER and not IS_TURN:
-                continue  # Don't accept input if it's not your turn
+                continue
             try:
                 message = input()
             except EOFError:
                 RUNNING = False
-                sys.exit(1)
+                break
             if message == "LOGIN":
                 handle_login(client_socket)
             elif message == "REGISTER":
@@ -124,13 +129,9 @@ def handle_outside_input(client_socket):
                 handle_forfeit(client_socket)
     except (ConnectionResetError, socket.timeout):
         sys.stderr.write("Disconnected from the server.\n")
+        RUNNING = False
     finally:
-        if client_socket:
-            try:
-                client_socket.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
-        sys.stdout.write("Client socket closed.\n")
+        close_socket(client_socket)
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
@@ -179,7 +180,7 @@ def handle_join(client_socket):
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
 def main(args: list[str]) -> None:
-    global client_socket
+    global client_socket, RUNNING
     if len(args) != 2:
         sys.stderr.write("Usage: python client.py <server_address> <port>\n")
         sys.exit(1)
@@ -191,20 +192,16 @@ def main(args: list[str]) -> None:
         client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
         listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
-        listener_thread.daemon = True
         listener_thread.start()
 
         handle_outside_input(client_socket)
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}\n")
-        if client_socket:
-            try:
-                client_socket.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
     finally:
-        client_socket.shutdown(socket.SHUT_RDWR)
-        sys.exit(1)
+        RUNNING = False
+        listener_thread.join(timeout=5)
+        close_socket(client_socket)
+        sys.stdout.write("Client process exited.\n")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
