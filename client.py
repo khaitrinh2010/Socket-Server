@@ -99,6 +99,7 @@ def handle_outside_input(client_socket):
                 message = input()
             except EOFError:
                 RUNNING = False
+                break
             if message == "LOGIN":
                 handle_login(client_socket)
             elif message == "REGISTER":
@@ -166,7 +167,6 @@ def handle_join(client_socket):
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
 def main(args: list[str]) -> None:
-    global client_socket
     if len(args) != 2:
         sys.stderr.write("Usage: python client.py <server_address> <port>\n")
         sys.exit(1)
@@ -187,11 +187,9 @@ def main(args: list[str]) -> None:
         if client_socket:
             try:
                 client_socket.shutdown(socket.SHUT_RDWR)
+                sys.exit(1)
             except OSError:
                 pass
-    finally:
-        client_socket.shutdown(socket.SHUT_RDWR)
-        sys.exit(1)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
