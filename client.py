@@ -34,6 +34,7 @@ def listen_to_message_from_server(client_socket):
             process_server_message(response)
         except (ConnectionResetError, EOFError):
             print("Disconnected from the server.")
+            client_socket.close()
             break
 
 
