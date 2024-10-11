@@ -188,11 +188,11 @@ def main(args: list[str]) -> None:
     try:
         client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
-        listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
-        listener_thread.daemon = True
-        listener_thread.start()
+        # listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
+        # listener_thread.daemon = True
+        # listener_thread.start()
 
-        handle_outside_input(client_socket)
+        #handle_outside_input(client_socket)
     except Exception as e:
         print(f"An error occurred: {e}")
         if client_socket:

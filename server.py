@@ -67,7 +67,7 @@ def init_server(host, port, path):
                             # read_server.remove(sock)
                             # sock.close()
                             # continue
-                        handle_client_message(message, path, sock)
+                        #handle_client_message(message, path, sock)
                     except Exception as e:
                         socket_list.remove(sock)
                         del clients[sock]
