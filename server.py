@@ -68,7 +68,7 @@ def init_server(host, port, path):
                     except Exception as e:
                         socket_list.remove(sock)
                         del clients[sock]
-                        sock.close()  # Ensure the socket is closed
+                        sock.close()
             for sock in exceptional_server:
                 socket_list.remove(sock)
                 del clients[sock]
