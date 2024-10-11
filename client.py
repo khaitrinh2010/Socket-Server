@@ -37,6 +37,12 @@ def listen_to_message_from_server(client_socket):
             print("Disconnected from the server.")
             client_socket.close()
             break
+        finally:
+            if client_socket:
+                try:
+                    client_socket.close()  # Ensure the socket is closed
+                except OSError:
+                    pass
 
 
 def process_server_message(response):
@@ -94,36 +100,41 @@ def process_server_message(response):
 
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN
-    while True:
-        if WAITING_FOR_PLAYER:
-            continue  # Don't accept input while waiting for the other player
-        if IS_PLAYER and not IS_TURN:
-            continue  # Don't accept input if it's not your turn
-        try:
-            message = input()
-        except EOFError:
-            print("Exiting...")
-            client_socket.close()
-            break
-        if message == "LOGIN":
-            handle_login(client_socket)
-        elif message == "REGISTER":
-            handle_register(client_socket)
-        elif message == "ROOMLIST":
-            handle_room_list(client_socket)
-        elif message == "CREATE":
-            handle_create(client_socket)
-        elif message == "JOIN":
-            handle_join(client_socket)
-        elif message == "PLACE":
-            if IS_PLAYER:
+    try:
+        while True:
+            if WAITING_FOR_PLAYER:
+                continue
+            if IS_PLAYER and not IS_TURN:
+                continue
+            try:
+                message = input()
+            except EOFError:
+                print("Input finished. Terminating client.")
+                client_socket.send("DISCONNECT".encode('ascii'))
+                break
+            if message == "LOGIN":
+                handle_login(client_socket)
+            elif message == "REGISTER":
+                handle_register(client_socket)
+            elif message == "ROOMLIST":
+                handle_room_list(client_socket)
+            elif message == "CREATE":
+                handle_create(client_socket)
+            elif message == "JOIN":
+                handle_join(client_socket)
+            elif message == "PLACE":
                 execute_place_client(client_socket)
                 print()
-            else:
-                print("You must be a player to perform this action")
-        elif message == "FORFEIT":
-            handle_forfeit(client_socket)
-
+            elif message == "FORFEIT":
+                handle_forfeit(client_socket)
+    except (ConnectionResetError, socket.timeout):
+        print("Disconnected from the server.")
+    finally:
+        if client_socket:
+            try:
+                client_socket.close()
+            except OSError:
+                pass
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
