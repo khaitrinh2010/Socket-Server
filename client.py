@@ -20,7 +20,7 @@ RUNNING = True
 def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
-    client_socket.settimeout(8)
+    #client_socket.settimeout(8)
     return client_socket
 
 def listen_to_message_from_server(client_socket):
@@ -42,7 +42,6 @@ def listen_to_message_from_server(client_socket):
                 client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
-        client_socket.close()
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
@@ -131,7 +130,6 @@ def handle_outside_input(client_socket):
                 client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
-        client_socket.close()
         print("Client socket closed.")
 
 def handle_forfeit(client_socket):
@@ -206,7 +204,6 @@ def main(args: list[str]) -> None:
                 pass
     finally:
         client_socket.shutdown(socket.SHUT_RDWR)
-        client_socket.close()
         print("Client socket closed.")
 
 if __name__ == "__main__":
