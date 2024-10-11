@@ -63,9 +63,10 @@ def init_server(host, port, path):
                     try:
                         message = sock.recv(8192).decode('ascii')
                         if not message:
-                            read_server.remove(sock)
-                            sock.close()
-                            continue
+                            break
+                            # read_server.remove(sock)
+                            # sock.close()
+                            # continue
                         handle_client_message(message, path, sock)
                     except Exception as e:
                         socket_list.remove(sock)
@@ -81,6 +82,8 @@ def init_server(host, port, path):
         for sock in socket_list:
             sock.close()
     server.close()
+
+
 def main(args: list[str]) -> None:
     # Begin here!
     if(len(args) != 1):
