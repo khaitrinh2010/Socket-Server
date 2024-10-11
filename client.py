@@ -21,6 +21,7 @@ WAITING_FOR_OPPONENT = False #WAIT FOR OPPONENT TO MOVE
 def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
+    client_socket.setblocking(False)
     return client_socket
 
 
