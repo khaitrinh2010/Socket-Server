@@ -83,7 +83,6 @@ def process_server_message(response):
             sys.stdout.write("It is the opponent's turn.\n")
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
-        RUNNING = False  # Stop after game ends
     else:
         sys.stdout.write(response + "\n")
 
