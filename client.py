@@ -108,8 +108,6 @@ def handle_outside_input(client_socket):
             try:
                 message = input()
             except EOFError:
-                print("Input finished. Terminating client.")
-                client_socket.send("DISCONNECT".encode('ascii'))
                 break
             if message == "LOGIN":
                 handle_login(client_socket)
