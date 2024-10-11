@@ -75,9 +75,9 @@ def init_server(host, port, path):
                 sock.close()  # Ensure the socket is closed
     except KeyboardInterrupt: #
         print("Server shutting down.")
-    finally:
-        for sock in socket_list:
-            sock.close()  # Ensure all sockets are closed
+    # finally:
+    #     for sock in socket_list:
+    #         sock.close()  # Ensure all sockets are closed
 
 def main(args: list[str]) -> None:
     # Begin here!
@@ -92,7 +92,7 @@ def main(args: list[str]) -> None:
         PORT = data['port']
         DATABASE_PATH = data['userDatabase']
     load_users_from_file(DATABASE_PATH)
-    init_server('127.0.0.1', int(PORT), DATABASE_PATH)
+    init_server('127.0.0.1', PORT, DATABASE_PATH)
 
 
 

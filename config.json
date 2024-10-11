@@ -1,0 +1,4 @@
+{
+  "port": 65432,
+  "userDatabase": "DATABASE.json"
+}
