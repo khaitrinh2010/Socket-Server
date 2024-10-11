@@ -46,6 +46,7 @@ def init_server(host, port, path):
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((host, port))
     server.listen(5)
+    server.settimeout(8)
     socket_list = [server]
     clients = {}
     try:
@@ -72,7 +73,7 @@ def init_server(host, port, path):
             for sock in exceptional_server:
                 socket_list.remove(sock)
                 del clients[sock]
-                sock.close()  # Ensure the socket is closed
+                sock.close()
     except KeyboardInterrupt: #
         print("Server shutting down.")
     finally:
