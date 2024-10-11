@@ -20,7 +20,6 @@ RUNNING = True
 def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
-    #client_socket.settimeout(8)
     return client_socket
 
 def listen_to_message_from_server(client_socket):
@@ -34,7 +33,8 @@ def listen_to_message_from_server(client_socket):
         except (ConnectionResetError, socket.timeout, EOFError):
             sys.stderr.write("Disconnected from the server.\n")
             RUNNING = False
-
+            break
+    close_socket(client_socket)
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
@@ -50,7 +50,6 @@ def process_server_message(response):
             IS_TURN = False
         elif player2 == USERNAME:
             IS_TURN = True
-
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
         sys.stdout.write(handle_returned_room_list(response, MODE) + "\n")
@@ -84,6 +83,7 @@ def process_server_message(response):
             sys.stdout.write("It is the opponent's turn.\n")
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
+        RUNNING = False  # Stop after game ends
     else:
         sys.stdout.write(response + "\n")
 
@@ -98,6 +98,7 @@ def handle_outside_input(client_socket):
             try:
                 message = input()
             except EOFError:
+                sys.stdout.write("\nEnd of input detected. Shutting down...\n")
                 RUNNING = False
                 break
             if message == "LOGIN":
@@ -116,9 +117,9 @@ def handle_outside_input(client_socket):
             elif message == "FORFEIT":
                 handle_forfeit(client_socket)
     except Exception as e:
-        sys.stderr.write("Disconnected from the server.\n")
-        return
-
+        sys.stderr.write(f"An error occurred: {e}\n")
+    finally:
+        close_socket(client_socket)
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
@@ -166,7 +167,17 @@ def handle_join(client_socket):
     MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
+def close_socket(client_socket):
+    if client_socket:
+        try:
+            client_socket.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        client_socket.close()
+        sys.stdout.write("Client socket closed.\n")
+
 def main(args: list[str]) -> None:
+    global RUNNING
     if len(args) != 2:
         sys.stderr.write("Usage: python client.py <server_address> <port>\n")
         sys.exit(1)
@@ -178,18 +189,16 @@ def main(args: list[str]) -> None:
         client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
         listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
-        listener_thread.daemon = True
         listener_thread.start()
 
         handle_outside_input(client_socket)
+        listener_thread.join()  # Ensure listener thread finishes before exiting
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}\n")
-        if client_socket:
-            try:
-                client_socket.shutdown(socket.SHUT_RDWR)
-                sys.exit(1)
-            except OSError:
-                pass
+    finally:
+        RUNNING = False
+        close_socket(client_socket)
+        sys.stdout.write("Client process exited.\n")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
