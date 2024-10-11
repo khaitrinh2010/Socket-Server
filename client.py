@@ -35,13 +35,13 @@ def listen_to_message_from_server(client_socket):
             except (ConnectionResetError, socket.timeout, EOFError):
                 print("Disconnected from the server.")
                 RUNNING = False
-                break
     finally:
         if client_socket:
             try:
                 client_socket.shutdown(socket.SHUT_RDWR)
             except OSError:
                 pass
+            sys.exit(1)
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
@@ -106,7 +106,7 @@ def handle_outside_input(client_socket):
                 message = input()
             except EOFError:
                 RUNNING = False
-                break
+                sys.exit(1)
             if message == "LOGIN":
                 handle_login(client_socket)
             elif message == "REGISTER":
