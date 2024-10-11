@@ -21,28 +21,27 @@ WAITING_FOR_OPPONENT = False #WAIT FOR OPPONENT TO MOVE
 def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
-    client_socket.settimeout(10)
     return client_socket
 
 
 def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER
-    while True:
-        try:
-            response = client_socket.recv(8192).decode('ascii')
-            if not response:
-                raise ConnectionResetError
-            process_server_message(response)
-        except (ConnectionResetError, EOFError):
-            print("Disconnected from the server.")
-            client_socket.close()
-            break
-        finally:
-            if client_socket:
-                try:
-                    client_socket.close()  # Ensure the socket is closed
-                except OSError:
-                    pass
+    try:
+        while True:
+            try:
+                response = client_socket.recv(8192).decode('ascii')
+                if not response:
+                    raise ConnectionResetError
+                process_server_message(response)
+            except (ConnectionResetError, socket.timeout):
+                print("Disconnected from the server.")
+                break
+    finally:
+        if client_socket:
+            try:
+                client_socket.close()
+            except OSError:
+                pass
 
 
 def process_server_message(response):
