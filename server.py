@@ -78,7 +78,7 @@ def init_server(host, port, path):
     # finally:
     #     for sock in socket_list:
     #         sock.close()  # Ensure all sockets are closed
-
+    server.close()
 def main(args: list[str]) -> None:
     # Begin here!
     if(len(args) != 1):
