@@ -91,34 +91,31 @@ def process_server_message(response):
 
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN, RUNNING
-    try:
-        while True:
-            if WAITING_FOR_PLAYER:
-                continue
-            if IS_PLAYER and not IS_TURN:
-                continue
-            try:
-                message = input()
-            except EOFError:
-                sys.stdout.write("\nEnd of input detected. Shutting down...\n")
-                break
-            if message == "LOGIN":
-                handle_login(client_socket)
-            elif message == "REGISTER":
-                handle_register(client_socket)
-            elif message == "ROOMLIST":
-                handle_room_list(client_socket)
-            elif message == "CREATE":
-                handle_create(client_socket)
-            elif message == "JOIN":
-                handle_join(client_socket)
-            elif message == "PLACE":
-                execute_place_client(client_socket)
-                sys.stdout.write("\n")
-            elif message == "FORFEIT":
-                handle_forfeit(client_socket)
-    except Exception as e:
-        sys.stderr.write(f"An error occurred: {e}\n")
+    while True:
+        if WAITING_FOR_PLAYER:
+            continue
+        if IS_PLAYER and not IS_TURN:
+            continue
+        try:
+            message = input()
+        except EOFError:
+            sys.stdout.write("\nEnd of input detected. Shutting down...\n")
+            break
+        if message == "LOGIN":
+            handle_login(client_socket)
+        elif message == "REGISTER":
+            handle_register(client_socket)
+        elif message == "ROOMLIST":
+            handle_room_list(client_socket)
+        elif message == "CREATE":
+            handle_create(client_socket)
+        elif message == "JOIN":
+            handle_join(client_socket)
+        elif message == "PLACE":
+            execute_place_client(client_socket)
+            sys.stdout.write("\n")
+        elif message == "FORFEIT":
+            handle_forfeit(client_socket)
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
@@ -185,19 +182,15 @@ def main(args: list[str]) -> None:
     SERVER_ADDRESS = args[0]
     PORT = int(args[1])
 
-    try:
-        client_socket = connect_to_server(SERVER_ADDRESS, PORT)
+    client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
-        listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
-        listener_thread.start()
+    listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
+    listener_thread.start()
 
-        handle_outside_input(client_socket)
-        listener_thread.join()
-    except Exception as e:
-        sys.stderr.write(f"An error occurred: {e}\n")
-    finally:
-        client_socket.shutdown(socket.SHUT_RDWR)
-        client_socket.close()
+    handle_outside_input(client_socket)
+    listener_thread.join()
+    client_socket.shutdown(socket.SHUT_RDWR)
+    client_socket.close()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
