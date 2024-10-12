@@ -24,7 +24,7 @@ def connect_to_server(host, port):
 
 def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER, RUNNING
-    while RUNNING:
+    while True:
         try:
             response = client_socket.recv(8192).decode('ascii')
             if not response:
@@ -170,11 +170,9 @@ def handle_join(client_socket):
 def close_socket(client_socket):
     if client_socket:
         try:
-            client_socket.shutdown(socket.SHUT_RDWR)
+            client_socket.close()
         except OSError:
             pass
-        client_socket.close()
-        sys.stdout.write("Client socket closed.\n")
 
 def main(args: list[str]) -> None:
     global RUNNING
@@ -188,11 +186,11 @@ def main(args: list[str]) -> None:
     try:
         client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
-        # listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
-        # listener_thread.start()
+        listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
+        listener_thread.start()
 
         handle_outside_input(client_socket)
-        #listener_thread.join()  # Ensure listener thread finishes before exiting
+        listener_thread.join()
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}\n")
     finally:
