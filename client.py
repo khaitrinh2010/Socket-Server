@@ -198,7 +198,7 @@ def main(args: list[str]) -> None:
     listener_thread.start()
 
     handle_outside_input(client_socket)
-    listener_thread.join(3)
+    listener_thread.join(4)
     client_socket.shutdown(socket.SHUT_RDWR)
     client_socket.close()
 
