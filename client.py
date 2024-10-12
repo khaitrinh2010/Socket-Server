@@ -35,7 +35,6 @@ def listen_to_message_from_server(client_socket):
             sys.stderr.write("Disconnected from the server.\n")
             break
         except Exception as e:
-            #sys.stdout.write(f"response {response}")
             sys.stderr.write(f"An error occurred in listen_to_message_from_server: {type(e).__name__}: {e}\n")
             break
 
@@ -159,7 +158,6 @@ def handle_room_list(client_socket):
     global MODE
     MODE = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
     m = f"ROOMLIST:{MODE}"
-    sys.stdout.write(f"Sending message: {m}\n")
     client_socket.send(f"ROOMLIST:{MODE}".encode('ascii'))
 
 

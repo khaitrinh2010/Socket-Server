@@ -70,7 +70,8 @@ def room_list(all_rooms, message, sock):
         rooms = ",".join(rooms_available)
         sock.send(f"ROOMLIST:ACKSTATUS:0:{rooms}".encode('ascii'))
     else:
-        sock.send("ROOMLIST:messi")
+        sock.send("ROOMLIST:ACKSTATUS:0:".encode('ascii'))
+
 
 def is_valid_room(room_name):
     return bool(re.match(r'^[a-zA-Z0-9_-]{1,20}$', room_name))
