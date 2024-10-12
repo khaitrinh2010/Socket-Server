@@ -24,24 +24,19 @@ def connect_to_server(host, port):
     return client_socket
 
 def listen_to_message_from_server(client_socket):
-    global WAITING_FOR_PLAYER
-    try:
-        while True:
-            try:
-                response = client_socket.recv(8192).decode('ascii')
-                if not response:
-                    raise ConnectionResetError
-                process_server_message(response)
-            except (ConnectionResetError, socket.timeout):
-                print("Disconnected from the server.")
-                break
-    finally:
-        if client_socket:
-            try:
-                client_socket.shutdown(socket.SHUT_RDWR)
-            except OSError:
-                pass
-        client_socket.close()
+    global WAITING_FOR_PLAYER, RUNNING
+    while True:
+        try:
+            response = client_socket.recv(8192).decode('ascii')
+            if not response:
+                raise ConnectionResetError
+            process_server_message(response)
+        except (ConnectionResetError, socket.timeout):
+            sys.stderr.write("Disconnected from the server.\n")
+            break
+        except Exception as e:
+            sys.stderr.write(f"An error occurred in listen_to_message_from_server: {type(e).__name__}: {e}\n")
+            break
 
 
 def process_server_message(response):
@@ -198,6 +193,7 @@ def main(args: list[str]) -> None:
     client_socket = connect_to_server(SERVER_ADDRESS, PORT)
 
     listener_thread = threading.Thread(target=listen_to_message_from_server, args=(client_socket,))
+    listener_thread.daemon = True
     listener_thread.start()
 
     handle_outside_input(client_socket)
