@@ -91,7 +91,10 @@ def process_server_message(response):
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
     else:
-        sys.stdout.write(response)
+        try:
+            sys.stdout.write(response)
+        except Exception as e:
+            sys.stderr.write(f"Error in else: {e}\n")
 
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN, RUNNING
