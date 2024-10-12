@@ -34,7 +34,7 @@ def listen_to_message_from_server(client_socket):
             sys.stderr.write("Disconnected from the server.\n")
             break
         except Exception as e:
-            sys.stdout.write(response)
+            sys.stdout.write(f"response {response}")
             sys.stderr.write(f"Error: {e}\n")
             sys.stderr.write(f"Messi goat\n")
             break
