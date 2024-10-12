@@ -195,7 +195,7 @@ def main(args: list[str]) -> None:
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}\n")
     finally:
-        close_socket(client_socket)
+        client_socket.close()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
