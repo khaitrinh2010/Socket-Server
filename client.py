@@ -51,6 +51,7 @@ def process_server_message(response):
             IS_TURN = True
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
+        sys.stdout.write("\nresponse from server: " + response)
         sys.stdout.write(handle_returned_room_list(response, MODE) + "\n")
     elif response.startswith("CREATE"):
         if "ACKSTATUS:0" in response:
@@ -148,9 +149,9 @@ def handle_register(client_socket):
 def handle_room_list(client_socket):
     global MODE
     MODE = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
-    sys.stdout.write("goat before")
     client_socket.send(f"ROOMLIST:{MODE}".encode('ascii'))
-    sys.stdout.write("goat after")
+
+
 def handle_create(client_socket):
     global ROOM_NAME, WAITING_FOR_PLAYER
     ROOM_NAME = input("Enter room name: ")
