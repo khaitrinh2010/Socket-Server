@@ -34,6 +34,7 @@ def listen_to_message_from_server(client_socket):
             sys.stderr.write("Disconnected from the server.\n")
             break
         except Exception as e:
+            sys.stdout.write(response)
             sys.stderr.write(f"Error: {e}\n")
             sys.stderr.write(f"Messi goat\n")
             break
@@ -56,6 +57,7 @@ def process_server_message(response):
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
         sys.stdout.write("\nresponse from server: " + response)
+        sys.stdout.write("Hey: {handle_returned_room_list(response, MODE)}")
         sys.stdout.write(handle_returned_room_list(response, MODE) + "\n")
     elif response.startswith("CREATE"):
         if "ACKSTATUS:0" in response:
