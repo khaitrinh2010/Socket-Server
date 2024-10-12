@@ -35,8 +35,7 @@ def listen_to_message_from_server(client_socket):
             break
         except Exception as e:
             #sys.stdout.write(f"response {response}")
-            sys.stderr.write(f"Error: {e}\n")
-            sys.stderr.write(f"Messi goat\n")
+            sys.stderr.write(f"An error occurred in listen_to_message_from_server: {type(e).__name__}: {e}\n")
             break
 
 
@@ -44,7 +43,6 @@ def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
     sys.stdout.write("\r" + " " * 80 + "\r")
     if response.startswith("LOGIN"):
-        sys.stdout.write("Me may beo\n")
         sys.stdout.write(handle_return_login(response, USERNAME) + "\n")
     elif response.startswith("REGISTER"):
         sys.stdout.write(handle_return_register(response, USERNAME) + "\n")
@@ -91,7 +89,8 @@ def process_server_message(response):
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
     else:
-        sys.stdout.write(response + "\n")
+        sys.stdout.write("siuuuuuuuuu")
+        sys.stdout.write(response)
 
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN, RUNNING
