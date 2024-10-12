@@ -1,6 +1,9 @@
 import sys
 import socket
 import threading
+
+from pyexpat.errors import messages
+
 from client_side.returned_authentication_message import handle_return_login, handle_return_register
 from client_side.listen_to_server_action import handle_return_begin
 from client_side.returned_room_message import handle_returned_create, handle_returned_join, handle_returned_room_list
@@ -169,6 +172,8 @@ def handle_join(client_socket):
     global ROOM_NAME, MODE
     ROOM_NAME = input("Enter room name to join: ").strip()
     MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
+    message = f"JOIN:{ROOM_NAME}:{MODE}"
+    sys.stdout.write(f"Sending message: {message}\n")
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
 def close_socket(client_socket):
