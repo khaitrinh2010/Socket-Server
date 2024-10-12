@@ -89,7 +89,6 @@ def process_server_message(response):
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
     else:
-        sys.stdout.write("siuuuuuuuuu")
         sys.stdout.write(response)
 
 def handle_outside_input(client_socket):
