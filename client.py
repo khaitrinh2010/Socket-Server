@@ -159,7 +159,7 @@ def handle_create(client_socket):
     global ROOM_NAME, WAITING_FOR_PLAYER
     ROOM_NAME = input("Enter room name: ")
     client_socket.send(f"CREATE:{ROOM_NAME}".encode('ascii'))
-    WAITING_FOR_PLAYER = True  # Set to true when waiting for second player
+    #WAITING_FOR_PLAYER = True  # Set to true when waiting for second player
 
 def handle_join(client_socket):
     global ROOM_NAME, MODE
