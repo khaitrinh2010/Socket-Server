@@ -148,8 +148,9 @@ def handle_register(client_socket):
 def handle_room_list(client_socket):
     global MODE
     MODE = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
+    sys.stdout.write("goat before")
     client_socket.send(f"ROOMLIST:{MODE}".encode('ascii'))
-
+    sys.stdout.write("goat after")
 def handle_create(client_socket):
     global ROOM_NAME, WAITING_FOR_PLAYER
     ROOM_NAME = input("Enter room name: ")
@@ -191,7 +192,6 @@ def main(args: list[str]) -> None:
         sys.stderr.write(f"An error occurred: {e}\n")
     finally:
         close_socket(client_socket)
-        sys.stdout.write("Client process exited.\n")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
