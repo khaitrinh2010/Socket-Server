@@ -33,6 +33,9 @@ def listen_to_message_from_server(client_socket):
         except (ConnectionResetError, socket.timeout, EOFError):
             sys.stderr.write("Disconnected from the server.\n")
             break
+        except Exception as e:
+            sys.stderr.write(f"An error occurred: {e}\n")
+            break
 
 
 def process_server_message(response):
