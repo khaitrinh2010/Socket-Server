@@ -129,6 +129,7 @@ def execute_place_client(client_socket):
     while True:
         if not col.isnumeric() or not row.isnumeric() or not (0 <= int(col) <= 2 and 0 <= int(row) <= 2):
             sys.stdout.write(" (Column/Row) values must be an integer between 0 and 2\n")
+            print(f"row: {row}, col: {col}")
             col = input("Column: ")
             row = input("Row: ")
         else:
