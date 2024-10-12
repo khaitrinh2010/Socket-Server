@@ -57,6 +57,7 @@ def process_server_message(response):
             IS_TURN = True
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
+        sys.stdout.write(f"response from ROOMLIST: {response}\n")
         try:
             sys.stdout.write(handle_returned_room_list(response, MODE) + "\n")
         except Exception as e:
