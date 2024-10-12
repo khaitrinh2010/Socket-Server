@@ -34,6 +34,7 @@ def listen_to_message_from_server(client_socket):
             sys.stderr.write("Disconnected from the server.\n")
             break
 
+
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
     sys.stdout.write("\r" + " " * 80 + "\r")
@@ -92,11 +93,10 @@ def handle_outside_input(client_socket):
                 continue
             if IS_PLAYER and not IS_TURN:
                 continue
-            try:
-                message = input()
-            except EOFError:
-                sys.stdout.write("\nEnd of input detected. Shutting down...\n")
-                break
+            message = input()
+            # except EOFError:
+            #     sys.stdout.write("\nEnd of input detected. Shutting down...\n")
+            #     break
             if message == "LOGIN":
                 handle_login(client_socket)
             elif message == "REGISTER":
