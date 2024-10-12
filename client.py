@@ -170,9 +170,11 @@ def handle_join(client_socket):
 def close_socket(client_socket):
     if client_socket:
         try:
-            client_socket.close()
+            client_socket.shutdown(socket.SHUT_RDWR)
         except OSError:
             pass
+        client_socket.close()
+        sys.stdout.write("Client socket closed.\n")
 
 def main(args: list[str]) -> None:
     global RUNNING
