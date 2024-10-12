@@ -97,10 +97,11 @@ def handle_outside_input(client_socket):
                 continue
             if IS_PLAYER and not IS_TURN:
                 continue
-            message = input()
-            # except EOFError:
-            #     sys.stdout.write("\nEnd of input detected. Shutting down...\n")
-            #     break
+            try:
+                message = input()
+            except EOFError:
+                sys.stdout.write("\nEnd of input detected. Shutting down...\n")
+                break
             if message == "LOGIN":
                 handle_login(client_socket)
             elif message == "REGISTER":
