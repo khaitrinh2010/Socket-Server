@@ -90,7 +90,6 @@ def process_server_message(response):
         elif IS_PLAYER and not IS_TURN:
             sys.stdout.write("It is the opponent's turn.\n")
     elif response.startswith("GAMEEND"):
-        sys.stdout.write(f"Game end response: {response}\n")
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
     else:
         try:
@@ -105,11 +104,7 @@ def handle_outside_input(client_socket):
             continue
         if IS_PLAYER and not IS_TURN:
             continue
-        try:
-            message = input()
-        except EOFError:
-            sys.stdout.write("\nEnd of input detected. Shutting down...\n")
-            break
+        message = input()
         if message == "LOGIN":
             handle_login(client_socket)
         elif message == "REGISTER":
