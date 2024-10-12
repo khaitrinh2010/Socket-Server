@@ -38,21 +38,16 @@ def listen_to_message_from_server(client_socket):
             sys.stderr.write(f"Messi goat\n")
             break
 
+
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
     sys.stdout.write("\r" + " " * 80 + "\r")
     if response.startswith("LOGIN"):
-        login_message = handle_return_login(response, USERNAME)
-        if login_message:
-            sys.stdout.write(login_message + "\n")
+        sys.stdout.write(handle_return_login(response, USERNAME) + "\n")
     elif response.startswith("REGISTER"):
-        register_message = handle_return_register(response, USERNAME)
-        if register_message:
-            sys.stdout.write(register_message + "\n")
+        sys.stdout.write(handle_return_register(response, USERNAME) + "\n")
     elif response.startswith("BEGIN"):
-        begin_message = handle_return_begin(response)
-        if begin_message:
-            sys.stdout.write(begin_message + "\n")
+        sys.stdout.write(handle_return_begin(response) + "\n")
         player1, player2 = response.split(":")[1], response.split(":")[2]
         if player1 == USERNAME:
             IS_TURN = False
@@ -60,10 +55,8 @@ def process_server_message(response):
             IS_TURN = True
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
-        room_list_message = handle_returned_room_list(response, MODE)
-        if room_list_message:
-            sys.stdout.write("\nresponse from server: " + response)
-            sys.stdout.write(room_list_message + "\n")
+        sys.stdout.write("\nresponse from server: " + response)
+        sys.stdout.write(handle_returned_room_list(response, MODE) + "\n")
     elif response.startswith("CREATE"):
         if "ACKSTATUS:0" in response:
             sys.stdout.write(f"Successfully created room {ROOM_NAME}\n")
@@ -79,19 +72,13 @@ def process_server_message(response):
                 IS_PLAYER = True
             elif MODE == "VIEWER":
                 IS_VIEWER = True
-        join_message = handle_returned_join(response, ROOM_NAME, MODE)
-        if join_message:
-            sys.stdout.write(join_message + "\n")
+        sys.stdout.write(handle_returned_join(response, ROOM_NAME, MODE) + "\n")
     elif response.startswith("INPROGRESS"):
-        in_progress_message = handle_return_in_progress(response)
-        if in_progress_message:
-            sys.stdout.write(in_progress_message + "\n")
+        sys.stdout.write(handle_return_in_progress(response) + "\n")
     elif response.startswith("BADAUTH"):
         sys.stdout.write("Error: You must log in to perform this action\n")
     elif response.startswith("BOARDSTATUS"):
-        board_status_message = handle_return_board_status(response)
-        if board_status_message:
-            sys.stdout.write(board_status_message + "\n")
+        sys.stdout.write(handle_return_board_status(response) + "\n")
         if IS_TURN is not None:
             IS_TURN = not IS_TURN
         if IS_PLAYER and IS_TURN:
@@ -99,9 +86,7 @@ def process_server_message(response):
         elif IS_PLAYER and not IS_TURN:
             sys.stdout.write("It is the opponent's turn.\n")
     elif response.startswith("GAMEEND"):
-        game_end_message = handle_return_game_end(response, IS_PLAYER, USERNAME)
-        if game_end_message:
-            sys.stdout.write(game_end_message + "\n")
+        sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
     else:
         sys.stdout.write(response + "\n")
 
