@@ -32,9 +32,7 @@ def listen_to_message_from_server(client_socket):
             process_server_message(response)
         except (ConnectionResetError, socket.timeout, EOFError):
             sys.stderr.write("Disconnected from the server.\n")
-            RUNNING = False
             break
-    close_socket(client_socket)
 
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN
@@ -91,9 +89,9 @@ def handle_outside_input(client_socket):
     try:
         while True:
             if WAITING_FOR_PLAYER:
-                continue  # Don't accept input while waiting for the other player
+                continue
             if IS_PLAYER and not IS_TURN:
-                continue  # Don't accept input if it's not your turn
+                continue
             try:
                 message = input()
             except EOFError:
@@ -116,8 +114,6 @@ def handle_outside_input(client_socket):
                 handle_forfeit(client_socket)
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}\n")
-    finally:
-        close_socket(client_socket)
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
@@ -194,7 +190,6 @@ def main(args: list[str]) -> None:
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}\n")
     finally:
-        RUNNING = False
         close_socket(client_socket)
         sys.stdout.write("Client process exited.\n")
 
