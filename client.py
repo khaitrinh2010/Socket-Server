@@ -30,11 +30,11 @@ def listen_to_message_from_server(client_socket):
             if not response:
                 raise ConnectionResetError
             process_server_message(response)
-        except (ConnectionResetError, socket.timeout, EOFError):
+        except (ConnectionResetError, socket.timeout):
             sys.stderr.write("Disconnected from the server.\n")
             break
         except Exception as e:
-            sys.stderr.write(f"An error occurred: {e}\n")
+            sys.stderr.write(f"Messi goat\n")
             break
 
 
