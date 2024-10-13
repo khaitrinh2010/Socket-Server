@@ -202,4 +202,4 @@ def main(args: list[str]) -> None:
     client_socket.close()
 
 if __name__ == "__main__":
-    main(sys.argv[1:]) #
+    main(sys.argv[1:])
