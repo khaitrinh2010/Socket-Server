@@ -12,6 +12,7 @@ from model.User import User
 USERS = {} # MAP EACH USERNAME TO A USER OBJECT
 ROOMS = {} # MAP EACH ROOM NAME TO A ROOM OBJECT ta
 SOCKET_TO_USER = {}
+CLIENT_MESSAGE = {}
 
 
 def load_users_from_file(path):
@@ -42,6 +43,7 @@ def handle_client_message(message, path, sock:socket):
 
 
 def init_server(host, port, path):
+    global CLIENT_MESSAGE
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((host, port))
@@ -64,7 +66,11 @@ def init_server(host, port, path):
                             socket_list.remove(sock)
                             sock.close()
                             continue
-                        handle_client_message(message, path, sock)
+                        else:
+                            CLIENT_MESSAGE[sock] += message
+                            while "\n" in CLIENT_MESSAGE[sock]:
+                                message, CLIENT_MESSAGE[sock] = CLIENT_MESSAGE[sock].split("\n", 1)
+                                handle_client_message(message.strip(), path, sock)
                     except Exception as e:
                         socket_list.remove(sock)
                         del clients[sock]
