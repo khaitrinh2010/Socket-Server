@@ -46,7 +46,6 @@ def init_server(host, port, path):
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((host, port))
     server.listen(5)
-    server.settimeout(8)
     socket_list = [server]
     clients = {}
     try:
@@ -62,7 +61,7 @@ def init_server(host, port, path):
                     try:
                         message = sock.recv(8192).decode('ascii')
                         if not message:
-                            read_server.remove(sock)
+                            socket_list.remove(sock)
                             sock.close()
                             continue
                         handle_client_message(message, path, sock)
