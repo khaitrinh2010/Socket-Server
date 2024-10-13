@@ -28,6 +28,7 @@ def load_users_from_file(path):
         USERS[user['username']] = User(user['username'], user['password'])
 
 def handle_client_message(message, path, sock:socket):
+    message = message.strip()
     components = message.split(":")
     if components[0] == "LOGIN" or components[0] == "REGISTER":
         username = handle_authentication_message(message, path, sock, USERS)
@@ -65,12 +66,8 @@ def init_server(host, port, path):
                         if not message:
                             socket_list.remove(sock)
                             sock.close()
-                            break
-                        else:
-                            CLIENT_MESSAGE[sock] += message
-                            while "\n" in CLIENT_MESSAGE[sock]:
-                                message, CLIENT_MESSAGE[sock] = CLIENT_MESSAGE[sock].split("\n", 1)
-                                handle_client_message(message.strip(), path, sock)
+                            continue
+                        handle_client_message(message.strip(), path, sock)
                     except Exception as e:
                         socket_list.remove(sock)
                         del clients[sock]
