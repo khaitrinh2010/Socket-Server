@@ -65,7 +65,7 @@ def init_server(host, port, path):
                         if not message:
                             socket_list.remove(sock)
                             sock.close()
-                            continue
+                            break
                         else:
                             CLIENT_MESSAGE[sock] += message
                             while "\n" in CLIENT_MESSAGE[sock]:
