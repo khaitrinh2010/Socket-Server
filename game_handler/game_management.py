@@ -54,8 +54,8 @@ def handle_place(message, username, all_users, room_name, all_rooms):
     else:
         game.place("O", x, y)
         room.switch_turn()
-    handle_board_status(all_rooms[room_name])
-    handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms)
+    if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
+        handle_board_status(all_rooms[room_name])
 
 def handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
 
@@ -88,8 +88,7 @@ def handle_game_end_and_forfeit(message, username, all_users, room_name, all_roo
         FORFEIT = True
         STATUS  = "2"
     else:
-        return
-
+        return False
     if winner or FORFEIT:
         for p in room.get_viewers() + room.get_players():
             message = f"GAMEEND:{res}:{STATUS}:{winner.get_username()}".encode("ascii")
@@ -105,3 +104,4 @@ def handle_game_end_and_forfeit(message, username, all_users, room_name, all_roo
             except Exception as e:
                 print("Something went wrong")
     del all_rooms[room_name]
+    return True
