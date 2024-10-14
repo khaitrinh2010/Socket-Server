@@ -13,6 +13,7 @@ USERS = {} # MAP EACH USERNAME TO A USER OBJECT
 ROOMS = {} # MAP EACH ROOM NAME TO A ROOM OBJECT ta
 SOCKET_TO_USER = {}
 CLIENT_MESSAGE = {}
+LOGIN = False
 
 
 def load_users_from_file(path):
@@ -28,6 +29,7 @@ def load_users_from_file(path):
         USERS[user['username']] = User(user['username'], user['password'])
 
 def handle_client_message(message, path, sock:socket):
+    global LOGIN
     message = message.strip()
     components = message.split(":")
     if components[0] == "LOGIN" or components[0] == "REGISTER":

@@ -15,7 +15,7 @@ def handle_begin(all_rooms, socket_to_user):
                             sent_participants.add(participant)
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
-            handle_board_status(room)
+            #handle_board_status(room)
 
 
 def handle_in_progress(room):
@@ -27,8 +27,17 @@ def handle_in_progress(room):
 def handle_board_status(room):
     game = room.get_game()
     board = game.get_board()
+    res = ""
+    for row in board:
+        for cell in row:
+            if cell == " ":
+                res += "0"
+            elif cell == "X":
+                res += "1"
+            else:
+                res += "2"
     for p in room.get_viewers() + room.get_players():
-        message = f"BOARDSTATUS:{board}".encode("ascii")
+        message = f"BOARDSTATUS:{res}".encode("ascii")
         try:
             p.get_socket().send(message)
         except Exception as e:

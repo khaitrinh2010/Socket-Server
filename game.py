@@ -72,7 +72,7 @@ class Game:
             row_str = self.COLUMN_SEPARATOR.join(f" {value} " for value in row)
             output.append(f"{self.COLUMN_SEPARATOR}{row_str}{self.COLUMN_SEPARATOR}")
             output.append(self.ROW_SEPARATOR * self.N_ROW_SEPARATORS)
-        return '\n'.join(output)
+        return self.BOARD
 
     def player_turn(self, player: str) -> tuple[int, int]:
         """Does a player's turn and returns the position of the turn"""
