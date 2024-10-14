@@ -42,6 +42,7 @@ def handle_client_message(message, path, sock:socket):
             return
         if not SOCKET_TO_USER.get(sock):
             sock.send("BADAUTH".encode('ascii'))
+            return
         if components[0] in ["ROOMLIST", "JOIN", "CREATE"]:
             handle_room_message(message, ROOMS, USERS, SOCKET_TO_USER[sock], SOCKET_TO_USER, sock)
         elif components[0] in ["PLACE", "FORFEIT", "MOVE"]:
