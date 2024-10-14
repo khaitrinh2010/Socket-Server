@@ -77,4 +77,4 @@ def room_list(all_rooms, message, sock):
 
 
 def is_valid_room(room_name):
-    return bool(re.match(r'^[a-zA-Z0-9_-]{1,20}$', room_name))
+    return bool(re.match(r'^[a-zA-Z0-9 _-]{1,20}$', room_name))
