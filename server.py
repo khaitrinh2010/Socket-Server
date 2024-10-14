@@ -29,7 +29,6 @@ def load_users_from_file(path):
 
 def handle_client_message(message, path, sock:socket):
     message = message.strip()
-    message = "LOGIN:foo:bar:baz"
     components = message.split(":")
     if components[0] == "LOGIN" or components[0] == "REGISTER":
         username = handle_authentication_message(message, path, sock, USERS)
