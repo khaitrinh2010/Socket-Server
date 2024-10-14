@@ -62,6 +62,15 @@ def handle_game_end_and_forfeit(message, username, all_users, room_name, all_roo
     room = all_rooms[room_name]
     game = room.get_game()
     board = game.get_board()
+    res = ""
+    for row in board:
+        for cell in row:
+            if cell == " ":
+                res += "0"
+            elif cell == "X":
+                res += "1"
+            else:
+                res += "2"
     player1, player2 = room.get_players()
     winner = None
     FORFEIT = False
@@ -83,14 +92,14 @@ def handle_game_end_and_forfeit(message, username, all_users, room_name, all_roo
 
     if winner or FORFEIT:
         for p in room.get_viewers() + room.get_players():
-            message = f"GAMEEND:{board}:{STATUS}:{winner.get_username()}".encode("ascii")
+            message = f"GAMEEND:{res}:{STATUS}:{winner.get_username()}".encode("ascii")
             try:
                 p.get_socket().send(message)
             except Exception as e:
                 print("Something went wrong")
     elif DRAW:
         for p in room.get_viewers() + room.get_players():
-            message = f"GAMEEND:{board}:1".encode("ascii")
+            message = f"GAMEEND:{res}:1".encode("ascii")
             try:
                 p.get_socket().send(message)
             except Exception as e:
