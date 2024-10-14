@@ -42,7 +42,7 @@ def create_room(message, all_rooms, sock, username, all_users):
         sock.send("CREATE:ACKSTATUS:1".encode('ascii'))
         return
     if len(message) != 2:
-        sock.send("a CREATE:ACKSTATUS:4".encode('ascii'))
+        sock.send("CREATE:ACKSTATUS:4".encode('ascii'))
         return
 
     room_to_add = Room(room_name, [], [], Game())
@@ -54,6 +54,9 @@ def create_room(message, all_rooms, sock, username, all_users):
 
 
 def room_list(all_rooms, message, sock):
+    if(len(message) != 2):
+        sock.send("ROOMLIST:ACKSTATUS:1".encode('ascii'))
+        return
     mode = message[1]
     if mode not in ["PLAYER", "VIEWER"]:
         sock.send("ROOMLIST:ACKSTATUS:1".encode('ascii'))

@@ -5,9 +5,9 @@ def handle_authentication_message(message, db_path, sock, all_users):
     prompt = message[0]
     if len(message) != 3:
         if prompt == "LOGIN":
-            return "LOGIN:ACKSTATUS:3"
+            sock.send("LOGIN:ACKSTATUS:3".encode('ascii'))
         elif prompt == "REGISTER":
-            return "REGISTER:ACKSTATUS:2"
+            sock.send("REGISTER:ACKSTATUS:2".encode('ascii'))
     else:
         if prompt == "LOGIN":
             return handle_login(message, db_path, sock, all_users)
