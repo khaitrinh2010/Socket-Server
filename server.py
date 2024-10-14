@@ -70,17 +70,17 @@ def init_server(host, port, path):
                         message = sock.recv(8192).decode('ascii')
                         if not message:
                             socket_list.remove(sock)
-                            sock.close()
+                            sock.shutdown(socket.SHUT_RDWR)
                             continue
                         handle_client_message(message.strip(), path, sock)
                     except Exception as e:
                         socket_list.remove(sock)
                         del clients[sock]
-                        sock.close()
+                        sock.shutdown(socket.SHUT_RDWR)
             for sock in exceptional_server:
                 socket_list.remove(sock)
                 del clients[sock]
-                sock.close()
+                sock.shutdown(socket.SHUT_RDWR)
     except Exception as e: #
         print("Server shutting down.")
     finally:
