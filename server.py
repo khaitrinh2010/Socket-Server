@@ -72,6 +72,7 @@ def init_server(host, port, path):
                         handle_disconnect(sock)
                         socket_list.remove(sock)
                         sock.shutdown(socket.SHUT_RDWR)
+                        sock.close()
                         continue
                     try:
                         message = sock.recv(8192).decode('ascii')
@@ -80,16 +81,19 @@ def init_server(host, port, path):
                         #     socket_list.remove(sock)
                         #     sock.shutdown(socket.SHUT_RDWR)
                         #     continue
-                        handle_client_message(message.strip(), path, sock)
+                        if(message):
+                            handle_client_message(message.strip(), path, sock)
                     except Exception as e:
 
                         socket_list.remove(sock)
                         del clients[sock]
                         sock.shutdown(socket.SHUT_RDWR)
+                        sock.close()
             for sock in exceptional_server:
                 socket_list.remove(sock)
                 del clients[sock]
                 sock.shutdown(socket.SHUT_RDWR)
+                sock.close()
     except Exception as e: #
         print("Server shutting down.")
     finally:
@@ -112,7 +116,6 @@ def handle_disconnect(sock):
             room = foundUser.get_room()
             if room:
                 handle_game_end_and_forfeit(["FORFEIT"], username, USERS, room.get_name(), ROOMS)
-            del ROOMS[room.get_name()]
     except Exception as e:
         return
 
