@@ -5,6 +5,7 @@ class Room:
         self.players = players
         self.current_turn = None
         self.game = game # EACH ROOM WILL HAVE A UNIQUE GAME INSTANCE
+        self.is_started = False
     def add_viewer(self, viewer):
         self.viewers.append(viewer)
     def add_player(self, player):
@@ -31,3 +32,7 @@ class Room:
         self.game = game
     def is_play_first(self, player):
         return self.players[0].get_username() == player.get_username()
+    def is_started(self):
+        return self.is_started
+    def set_started(self, is_started):
+        self.is_started = is_started
