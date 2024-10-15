@@ -77,7 +77,6 @@ def init_server(host, port, path):
                         continue
                     try:
                         message = sock.recv(8192).decode('ascii')
-                        print(message)
                         # if not message:
                         #     handle_disconnect(sock)
                         #     socket_list.remove(sock)
