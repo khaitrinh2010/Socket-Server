@@ -28,13 +28,10 @@ def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER, RUNNING
     while True:
         try:
-            if client_socket:
-                response = client_socket.recv(8192).decode('ascii')
-                if not response:
-                    raise ConnectionResetError
-                process_server_message(response) #
-            else:
-                break
+            response = client_socket.recv(8192).decode('ascii')
+            if not response:
+                raise ConnectionResetError
+            process_server_message(response)  #
 
         except (ConnectionResetError, socket.timeout):
             sys.stderr.write("Disconnected from the server.\n")
@@ -208,6 +205,7 @@ def main(args: list[str]) -> None:
     listener_thread.join(4)
     client_socket.shutdown(socket.SHUT_RDWR)
     client_socket.close()
+    sys.exit(1)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
