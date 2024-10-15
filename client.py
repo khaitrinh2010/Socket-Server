@@ -124,6 +124,9 @@ def handle_outside_input(client_socket):
             sys.stdout.write("\n")
         elif message == "FORFEIT":
             handle_forfeit(client_socket)
+        elif message == "QUIT":
+            RUNNING = False
+            break
 
 def handle_forfeit(client_socket):
     client_socket.send("FORFEIT".encode('ascii'))
