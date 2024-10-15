@@ -1,7 +1,6 @@
 import sys
 import socket
 import threading
-import time
 
 from client_side.returned_authentication_message import handle_return_login, handle_return_register
 from client_side.listen_to_server_action import handle_return_begin
