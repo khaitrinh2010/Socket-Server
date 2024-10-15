@@ -107,6 +107,7 @@ def handle_outside_input(client_socket):
             continue
         try:
             message = input()
+            print(message)
         except EOFError:
             sys.stdout.write("\nEnd of input detected. Shutting down...\n")
             break
