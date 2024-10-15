@@ -66,7 +66,7 @@ def process_server_message(response):
         if "ACKSTATUS:0" in response:
             sys.stdout.write(f"Successfully created room {ROOM_NAME}\n")
             sys.stdout.write("Waiting for other player...\n")
-            WAITING_FOR_PLAYER = True  # Waiting for second player
+            WAITING_FOR_PLAYER = True
             IS_PLAYER = True
         else:
             sys.stdout.write("Failed to create room.\n")
@@ -77,6 +77,7 @@ def process_server_message(response):
                 IS_PLAYER = True
             elif MODE == "VIEWER":
                 IS_VIEWER = True
+            WAITING_FOR_PLAYER = False
         sys.stdout.write(handle_returned_join(response, ROOM_NAME, MODE) + "\n")
     elif response.startswith("INPROGRESS"):
         sys.stdout.write(handle_return_in_progress(response) + "\n")
