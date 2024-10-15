@@ -111,6 +111,7 @@ def socket_connected(sock):
 
 def handle_disconnect(sock):
     try:
+        print("SIUUU disconnect")
         username = SOCKET_TO_USER[sock]
         foundUser = USERS[username]
         if foundUser.get_room():
