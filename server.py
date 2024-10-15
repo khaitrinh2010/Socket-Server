@@ -8,6 +8,7 @@ from authen.user_management import handle_authentication_message
 from room.room_command_selection import handle_room_message
 from game_handler.game_command_selection import handle_game_command
 from model.User import User
+from game_handler.game_management import handle_game_end_and_forfeit
 
 USERS = {} # MAP EACH USERNAME TO A USER OBJECT
 ROOMS = {} # MAP EACH ROOM NAME TO A ROOM OBJECT ta
@@ -67,14 +68,21 @@ def init_server(host, port, path):
                     socket_list.append(client_socket)
                     clients[client_socket] = client_address
                 else:
+                    if not socket_connected(sock):
+                        handle_disconnect(sock)
+                        socket_list.remove(sock)
+                        sock.shutdown(socket.SHUT_RDWR)
+                        continue
                     try:
                         message = sock.recv(8192).decode('ascii')
-                        if not message:
-                            socket_list.remove(sock)
-                            sock.shutdown(socket.SHUT_RDWR)
-                            continue
+                        # if not message:
+                        #     handle_disconnect(sock)
+                        #     socket_list.remove(sock)
+                        #     sock.shutdown(socket.SHUT_RDWR)
+                        #     continue
                         handle_client_message(message.strip(), path, sock)
                     except Exception as e:
+
                         socket_list.remove(sock)
                         del clients[sock]
                         sock.shutdown(socket.SHUT_RDWR)
@@ -89,6 +97,24 @@ def init_server(host, port, path):
             sock.close()
     server.close()
 
+def socket_connected(sock):
+    try:
+        sock.send(b'')
+        return True
+    except Exception as e:
+        return False
+
+def handle_disconnect(sock):
+    try:
+        username = SOCKET_TO_USER[sock]
+        foundUser = USERS[username]
+        if(foundUser.get_room()):
+            room = foundUser.get_room()
+            if room:
+                handle_game_end_and_forfeit(["FORFEIT"], username, USERS, room.get_name(), ROOMS)
+            del ROOMS[room.get_name()]
+    except Exception as e:
+        return
 
 def main(args: list[str]) -> None:
     # Begin here!

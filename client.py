@@ -51,9 +51,9 @@ def process_server_message(response):
         sys.stdout.write(handle_return_begin(response) + "\n")
         player1, player2 = response.split(":")[1], response.split(":")[2]
         if player1 == USERNAME:
-            IS_TURN = False
-        elif player2 == USERNAME:
             IS_TURN = True
+        elif player2 == USERNAME:
+            IS_TURN = False
         WAITING_FOR_PLAYER = False  # Game begins, stop waiting
     elif response.startswith("ROOMLIST"):
         try:
