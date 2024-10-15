@@ -1,6 +1,7 @@
 import sys
 import socket
 import threading
+import time
 
 from client_side.returned_authentication_message import handle_return_login, handle_return_register
 from client_side.listen_to_server_action import handle_return_begin
@@ -28,10 +29,14 @@ def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER, RUNNING
     while True:
         try:
-            response = client_socket.recv(8192).decode('ascii')
-            if not response:
-                raise ConnectionResetError
-            process_server_message(response)
+            if client_socket:
+                response = client_socket.recv(8192).decode('ascii')
+                if not response:
+                    raise ConnectionResetError
+                process_server_message(response) #
+            else:
+                break
+
         except (ConnectionResetError, socket.timeout):
             sys.stderr.write("Disconnected from the server.\n")
             #break
