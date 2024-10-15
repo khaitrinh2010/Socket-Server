@@ -57,6 +57,7 @@ def init_server(host, port, path):
     server.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     server.bind((host, port))
     server.listen(5)
+    server.setblocking(False)
     socket_list = [server]
     clients = {}
     try:
