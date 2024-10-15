@@ -80,9 +80,11 @@ def handle_game_end_and_forfeit(message, username, all_users, room_name, all_roo
     if not socket_connected(player1.get_socket()):
         FORFEIT = True
         winner = player2
+        STATUS = "2"
     elif not socket_connected(player2.get_socket()):
         FORFEIT = True
         winner = player1
+        STATUS = "2"
     else:
         if game.player_wins("X"):
             winner = player1

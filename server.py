@@ -112,7 +112,7 @@ def handle_disconnect(sock):
     try:
         username = SOCKET_TO_USER[sock]
         foundUser = USERS[username]
-        if(foundUser.get_room()):
+        if foundUser.get_room():
             room = foundUser.get_room()
             if room:
                 handle_game_end_and_forfeit(["FORFEIT"], username, USERS, room.get_name(), ROOMS)
