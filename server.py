@@ -116,7 +116,7 @@ def handle_disconnect(sock):
             room = foundUser.get_room()
             if room:
                 handle_game_end_and_forfeit(["FORFEIT"], username, USERS, room.get_name(), ROOMS)
-    except Exception as e:
+    except Exception as e: #
         return
 
 def main(args: list[str]) -> None:
