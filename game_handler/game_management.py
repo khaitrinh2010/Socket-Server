@@ -46,6 +46,8 @@ def handle_board_status(room):
 
 def handle_place(message, username, all_users, room_name, all_rooms):
     x, y = int(message[1]), int(message[2])
+    print(all_rooms)
+    print(room_name)
     room = all_rooms[room_name]
     game = room.get_game()
     if len(room.get_players()) < 2:
