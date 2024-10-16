@@ -105,7 +105,8 @@ def socket_connected(sock):
         return False
 
 def handle_disconnect(sock):
-
+    if sock not in SOCKET_TO_USER:
+        return
     username = SOCKET_TO_USER[sock]
     foundUser = USERS[username]
     if foundUser.get_room():
