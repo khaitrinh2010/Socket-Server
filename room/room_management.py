@@ -33,7 +33,7 @@ def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
             game = room.get_game()
             game.place(cache[0], cache[1], cache[2])
 
-    sock.send("JOIN:ACKSTATUS:0".encode('ascii'))
+    sock.send("JOIN:ACKSTATUS:0\n".encode('ascii'))
     if room.is_started_yet():
         handle_in_progress(room)
         return
