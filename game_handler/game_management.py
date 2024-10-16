@@ -1,3 +1,7 @@
+o_first = False
+x_first = False
+have_x = False
+CACHED = False
 def handle_begin(all_rooms, socket_to_user):
     for room_name in all_rooms:
         room = all_rooms[room_name]
@@ -12,6 +16,8 @@ def handle_begin(all_rooms, socket_to_user):
                     if user_socket:
                         try:
                             user_socket.send(begin_message)
+                            if room.get_cache():
+                                handle_board_status(room)
                             sent_participants.add(participant)
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
@@ -44,22 +50,35 @@ def handle_board_status(room):
             print("Something went wrong")
     handle_in_progress(room)
 
+
 def handle_place(message, username, all_users, room_name, all_rooms):
-    x, y = int(message[1]), int(message[2])
-    print(all_rooms)
-    print(room_name)
+    global CACHED
     room = all_rooms[room_name]
     game = room.get_game()
+
+    x, y = int(message[1]), int(message[2])
+
     if len(room.get_players()) < 2:
         room.set_cache(["X", x, y])
         room.set_current_turn(None)
+        CACHED = True
         return
-    if room.is_play_first(all_users[username]):
-        game.place("X", x, y)
-        room.switch_turn()
+    if not CACHED:
+        if room.is_play_first(all_users[username]):
+            game.place("X", x, y)
+            room.switch_turn()
+        else:
+            game.place("O", x, y)
+            room.switch_turn()
     else:
-        game.place("O", x, y)
-        room.switch_turn()
+        if room.is_play_first(all_users[username]):
+            game.place("O", x, y)
+            room.switch_turn()
+        else:
+            game.place("X", x, y)
+            room.switch_turn()
+        CACHED = False
+
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
         handle_board_status(all_rooms[room_name])
 

@@ -7,6 +7,7 @@ class Room:
         self.game = game # EACH ROOM WILL HAVE A UNIQUE GAME INSTANCE
         self.is_started = False
         self.cache = []
+        self.is_cache = False
     def add_viewer(self, viewer):
         self.viewers.append(viewer)
     def add_player(self, player):
@@ -32,7 +33,7 @@ class Room:
     def set_game(self, game):
         self.game = game
     def is_play_first(self, player):
-        return self.players[0].get_username() == player.get_username()
+        return self.current_turn.get_username() == player.get_username()
     def is_started(self):
         return self.is_started
     def set_started(self, is_started):
@@ -41,3 +42,7 @@ class Room:
         return self.cache
     def set_cache(self, cache):
         self.cache = cache
+    def set_cache_status(self, status):
+        self.is_cache = status
+    def get_cache_status(self):
+        return self.is_cache
