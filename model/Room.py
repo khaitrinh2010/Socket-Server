@@ -34,7 +34,7 @@ class Room:
         self.game = game
     def is_play_first(self, player):
         return self.players[0].get_username() == player.get_username()
-    def is_started(self):
+    def is_started_yet(self):
         return self.is_started
     def set_started(self, is_started):
         self.is_started = is_started
