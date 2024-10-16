@@ -6,6 +6,7 @@ class Room:
         self.current_turn = None
         self.game = game # EACH ROOM WILL HAVE A UNIQUE GAME INSTANCE
         self.is_started = False
+        self.cache = []
     def add_viewer(self, viewer):
         self.viewers.append(viewer)
     def add_player(self, player):
@@ -36,3 +37,7 @@ class Room:
         return self.is_started
     def set_started(self, is_started):
         self.is_started = is_started
+    def get_cache(self):
+        return self.cache
+    def set_cache(self, cache):
+        self.cache = cache

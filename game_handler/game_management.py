@@ -49,7 +49,7 @@ def handle_place(message, username, all_users, room_name, all_rooms):
     room = all_rooms[room_name]
     game = room.get_game()
     if len(room.get_players()) < 2:
-        game.place("X", x, y)
+        room.set_cache(["X", x, y])
         room.set_current_turn(None)
         return
     if room.is_play_first(all_users[username]):
