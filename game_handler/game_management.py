@@ -18,13 +18,25 @@ def handle_begin(all_rooms, socket_to_user):
                         try:
                             user_socket.send(begin_message)
                             if room.get_cache():
-                                handle_board_status(room)
+                                user_socket.send(f"fBOARDSTATUS:{get_board_status(room)}".encode('ascii'))
                             sent_participants.add(participant)
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
             #handle_board_status(room)
 
-
+def get_board_status(room):
+    game = room.get_game()
+    board = game.get_board()
+    res = ""
+    for row in board:
+        for cell in row:
+            if cell == " ":
+                res += "0"
+            elif cell == "X":
+                res += "1"
+            else:
+                res += "2"
+    return res
 def handle_in_progress(room):
     for viewers in room.get_viewers():
         current_player = room.get_current_turn().get_username()
