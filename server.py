@@ -70,21 +70,22 @@ def init_server(host, port, path):
                 socket_list.append(client_socket)
                 clients[client_socket] = client_address
             else:
-                if not socket_connected(sock):
+
+                message = sock.recv(8192).decode('ascii')
+                # if not message:
+                #     handle_disconnect(sock)
+                #     socket_list.remove(sock)
+                #     sock.shutdown(socket.SHUT_RDWR)
+                #     continue
+                if not message:
                     handle_disconnect(sock)
                     socket_list.remove(sock)
+                    del clients[sock]
                     sock.shutdown(socket.SHUT_RDWR)
                     sock.close()
                     continue
-                else:
-                    message = sock.recv(8192).decode('ascii')
-                    # if not message:
-                    #     handle_disconnect(sock)
-                    #     socket_list.remove(sock)
-                    #     sock.shutdown(socket.SHUT_RDWR)
-                    #     continue
-                    if(message):
-                        handle_client_message(message.strip(), path, sock)
+                if(message):
+                    handle_client_message(message.strip(), path, sock)
                 # except Exception as e:
                 #
                 #     socket_list.remove(sock)
@@ -122,7 +123,7 @@ def handle_disconnect(sock):
                         res += "1"
                     else:
                         res += "2"
-            another_user.get_socket().send(f"GAMEEND:{res}:2:{username}".encode("ascii"))
+            another_user.get_socket().send(f"GAMEEND:{res}:2:{another_user.get_username()}".encode("ascii"))
 
     except Exception as e: #
         return
