@@ -130,7 +130,7 @@ def main(args: list[str]) -> None:
         PORT = data['port']
         DATABASE_PATH = os.path.expanduser(data['userDatabase'])
     load_users_from_file(DATABASE_PATH)
-    init_server('0.0.0.0', PORT, DATABASE_PATH)
+    init_server('0.0.0.0', PORT, DATABASE_PATH) #
 
 
 if __name__ == "__main__":
