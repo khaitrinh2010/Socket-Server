@@ -18,6 +18,7 @@ def handle_return_login(response: str, username):
         return f"User {username} not found"
     elif status == "2":
         return f"Wrong password for user {username}"
+    return ""
 
 def handle_return_register(response: str, username):
     bad_auth_msg = check_bad_auth(response)
