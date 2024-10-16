@@ -3,7 +3,7 @@ def handle_begin(all_rooms, socket_to_user):
         room = all_rooms[room_name]
         players = room.get_players()
         if len(players) == 2:
-            player1, player2 = players
+            player1, player2 = room.get_current_turn(), room.get_next_turn()
             begin_message = f"BEGIN:{player1.get_username()}:{player2.get_username()}".encode('ascii')
             sent_participants = set()
             for participant in players + room.get_viewers():
@@ -48,6 +48,10 @@ def handle_place(message, username, all_users, room_name, all_rooms):
     x, y = int(message[1]), int(message[2])
     room = all_rooms[room_name]
     game = room.get_game()
+    if len(room.get_players()) < 2:
+        game.place("X", x, y)
+        room.set_current_turn(None)
+        return
     if room.is_play_first(all_users[username]):
         game.place("X", x, y)
         room.switch_turn()

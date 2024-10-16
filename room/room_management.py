@@ -25,6 +25,9 @@ def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
     elif mode == "VIEWER":
         all_rooms[room_name].add_viewer(user_to_be_added)
     all_users[username].set_room(all_rooms[room_name])
+    room  = all_rooms[room_name]
+    if len(room.get_players()) == 2 and room.get_current_turn() is None:
+        room.set_current_turn(user_to_be_added)
     sock.send("JOIN:ACKSTATUS:0".encode('ascii'))
     if len(all_rooms[room_name].get_players()) == 2:
         handle_begin(all_rooms, socket_to_user)
