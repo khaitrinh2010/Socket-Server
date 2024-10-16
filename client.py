@@ -43,9 +43,7 @@ def listen_to_message_from_server(client_socket):
             sys.stderr.write("BrokenPipeError: Lost connection to the server.\n")
             close_socket(client_socket)
             break
-        except Exception as e:
-            sys.stderr.write(f"An error occurred in listen_to_message_from_server: {type(e).__name__}: {e}\n")
-            break
+
 
 
 def process_server_message(response):
