@@ -1,4 +1,5 @@
 import json
+import os.path
 import sys
 import socket
 
@@ -127,7 +128,7 @@ def main(args: list[str]) -> None:
     with open(server_config_path, 'r') as f:
         data = json.load(f)
         PORT = data['port']
-        DATABASE_PATH = data['userDatabase']
+        DATABASE_PATH = os.path.expanduser(data['userDatabase'])
     load_users_from_file(DATABASE_PATH)
     init_server('0.0.0.0', PORT, DATABASE_PATH)
 
