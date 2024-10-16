@@ -60,48 +60,42 @@ def init_server(host, port, path):
     server.setblocking(False)
     socket_list = [server]
     clients = {}
-    try:
-        while True:
-            read_server, _, exceptional_server = select.select(socket_list, [], socket_list)
-            for sock in read_server:
-                if sock == server:
-                    client_socket, client_address = server.accept()
-                    client_socket.setblocking(False)
-                    socket_list.append(client_socket)
-                    clients[client_socket] = client_address
+    while True:
+        read_server, _, exceptional_server = select.select(socket_list, [], socket_list)
+        for sock in read_server:
+            if sock == server:
+                client_socket, client_address = server.accept()
+                client_socket.setblocking(False)
+                socket_list.append(client_socket)
+                clients[client_socket] = client_address
+            else:
+                if not socket_connected(sock):
+                    handle_disconnect(sock)
+                    socket_list.remove(sock)
+                    sock.shutdown(socket.SHUT_RDWR)
+                    sock.close()
+                    continue
                 else:
-                    if not socket_connected(sock):
-                        handle_disconnect(sock)
-                        socket_list.remove(sock)
-                        sock.shutdown(socket.SHUT_RDWR)
-                        sock.close()
-                        continue
-                    else:
-                        message = sock.recv(8192).decode('ascii')
-                        # if not message:
-                        #     handle_disconnect(sock)
-                        #     socket_list.remove(sock)
-                        #     sock.shutdown(socket.SHUT_RDWR)
-                        #     continue
-                        if(message):
-                            handle_client_message(message.strip(), path, sock)
-                    # except Exception as e:
-                    #
+                    message = sock.recv(8192).decode('ascii')
+                    # if not message:
+                    #     handle_disconnect(sock)
                     #     socket_list.remove(sock)
-                    #     del clients[sock]
                     #     sock.shutdown(socket.SHUT_RDWR)
-                    #     sock.close()
-            for sock in exceptional_server:
-                socket_list.remove(sock)
-                del clients[sock]
-                sock.shutdown(socket.SHUT_RDWR)
-                sock.close()
-    except Exception as e: #
-        print("Server shutting down.")
-    finally:
-        for sock in socket_list:
+                    #     continue
+                    if(message):
+                        handle_client_message(message.strip(), path, sock)
+                # except Exception as e:
+                #
+                #     socket_list.remove(sock)
+                #     del clients[sock]
+                #     sock.shutdown(socket.SHUT_RDWR)
+                #     sock.close()
+        for sock in exceptional_server:
+            socket_list.remove(sock)
+            del clients[sock]
+            sock.shutdown(socket.SHUT_RDWR)
             sock.close()
-    server.close()
+
 
 def socket_connected(sock):
     try:
