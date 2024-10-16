@@ -94,7 +94,6 @@ def init_server(host, port, path):
         for sock in exceptional_server:
             socket_list.remove(sock)
             del clients[sock]
-            sock.shutdown(socket.SHUT_RDWR)
             sock.close()
 
 
@@ -112,8 +111,19 @@ def handle_disconnect(sock):
         foundUser = USERS[username]
         if foundUser.get_room():
             room = foundUser.get_room()
-            if room:
-                handle_game_end_and_forfeit(["FORFEIT"], username, USERS, room.get_name(), ROOMS)
+            another_user = room.get_players()[0] if room.get_players()[0].get_username() != username else room.get_players()[1]
+            board = room.get_game().get_board()
+            res = ""
+            for row in board:
+                for cell in row:
+                    if cell == " ":
+                        res += "0"
+                    elif cell == "X":
+                        res += "1"
+                    else:
+                        res += "2"
+            another_user.get_socket().send(f"GAMEEND:{res}:2:{username}".encode("ascii"))
+
     except Exception as e: #
         return
 
