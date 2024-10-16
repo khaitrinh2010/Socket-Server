@@ -3,7 +3,7 @@ def handle_begin(all_rooms, socket_to_user):
         room = all_rooms[room_name]
         players = room.get_players()
         if len(players) == 2:
-            player1, player2 = room.get_current_turn(), room.get_next_turn()
+            player1, player2 = players
             begin_message = f"BEGIN:{player1.get_username()}:{player2.get_username()}".encode('ascii')
             sent_participants = set()
             for participant in players + room.get_viewers():

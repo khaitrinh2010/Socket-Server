@@ -18,6 +18,7 @@ IS_VIEWER = False
 IS_TURN = None
 WAITING_FOR_OPPONENT = False  # WAIT FOR OPPONENT TO MOVE
 RUNNING = True
+HAVE_PLACED = False
 
 
 def connect_to_server(host, port):
@@ -47,7 +48,7 @@ def listen_to_message_from_server(client_socket):
 
 
 def process_server_message(response):
-    global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN, RUNNING
+    global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN, RUNNING, HAVE_PLACED
     sys.stdout.write("\r" + " " * 80 + "\r")  # Clear current line
 
     if response.startswith("LOGIN"):
@@ -57,7 +58,7 @@ def process_server_message(response):
     elif response.startswith("BEGIN"):
         sys.stdout.write(handle_return_begin(response) + "\n")
         player1, player2 = response.split(":")[1], response.split(":")[2]
-        if player1 == USERNAME:
+        if player1 == USERNAME and not HAVE_PLACED:
             IS_TURN = True
         else:
             IS_TURN = False
@@ -89,6 +90,7 @@ def process_server_message(response):
     elif response.startswith("BADAUTH"):
         sys.stdout.write("Error: You must log in to perform this action\n")
     elif response.startswith("BOARDSTATUS"):
+        HAVE_PLACED = False
         sys.stdout.write(handle_return_board_status(response) + "\n")
         if IS_TURN is not None:
             IS_TURN = not IS_TURN
@@ -145,6 +147,7 @@ def handle_forfeit(client_socket):
 
 
 def execute_place_client(client_socket):
+    global HAVE_PLACED
     col = input("Column: ")
     row = input("Row: ")
     while True:
@@ -155,6 +158,7 @@ def execute_place_client(client_socket):
             row = input("Row: ")
         else:
             break
+    HAVE_PLACED = True
     client_socket.send(f"PLACE:{col}:{row}".encode('ascii'))
 
 
