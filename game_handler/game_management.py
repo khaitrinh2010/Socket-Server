@@ -17,8 +17,6 @@ def handle_begin(all_rooms, socket_to_user):
                     if user_socket:
                         try:
                             user_socket.send(begin_message)
-                            if room.get_cache():
-                                handle_board_status(room)
                             sent_participants.add(participant)
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
