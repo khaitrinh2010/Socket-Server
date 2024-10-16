@@ -25,6 +25,8 @@ def handle_returned_join(message, room_name, mode):
         return f"Error: No room named {room_name}\n"
     elif status == "2":
         return f"Error: The room {room_name}  already has 2 players"
+    else:
+        return ""
 
 def handle_returned_room_list(message, mode):
     bad_auth_msg = check_bad_auth(message)
