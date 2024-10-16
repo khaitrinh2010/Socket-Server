@@ -76,7 +76,7 @@ def init_server(host, port, path):
                         sock.shutdown(socket.SHUT_RDWR)
                         sock.close()
                         continue
-                    try:
+                    else:
                         message = sock.recv(8192).decode('ascii')
                         # if not message:
                         #     handle_disconnect(sock)
@@ -85,12 +85,12 @@ def init_server(host, port, path):
                         #     continue
                         if(message):
                             handle_client_message(message.strip(), path, sock)
-                    except Exception as e:
-
-                        socket_list.remove(sock)
-                        del clients[sock]
-                        sock.shutdown(socket.SHUT_RDWR)
-                        sock.close()
+                    # except Exception as e:
+                    #
+                    #     socket_list.remove(sock)
+                    #     del clients[sock]
+                    #     sock.shutdown(socket.SHUT_RDWR)
+                    #     sock.close()
             for sock in exceptional_server:
                 socket_list.remove(sock)
                 del clients[sock]

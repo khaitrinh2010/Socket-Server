@@ -13,6 +13,7 @@ def handle_returned_create(message, room_name):
         return f"Error: Room {room_name} already exists"
     elif status == "3":
         return f"Error: Server already contains a maximum of 256 rooms"
+    return ""
 
 def handle_returned_join(message, room_name, mode):
     bad_auth_msg = check_bad_auth(message)
@@ -38,3 +39,5 @@ def handle_returned_room_list(message, mode):
         return f"Room available to join as {mode}: {room_list}"
     elif status == "1":
         return "ClientError: Please input a valid mode"
+    else:
+        return ""
