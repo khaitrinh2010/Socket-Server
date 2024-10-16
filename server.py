@@ -105,7 +105,7 @@ def socket_connected(sock):
         return False
 
 def handle_disconnect(sock):
-    print("SIUUU disconnect")
+
     username = SOCKET_TO_USER[sock]
     foundUser = USERS[username]
     if foundUser.get_room():
@@ -123,6 +123,8 @@ def handle_disconnect(sock):
                 else:
                     res += "2"
         another_user.get_socket().send(f"GAMEEND:{res}:2:{username}".encode("ascii"))
+    else:
+        return
 
 
 def main(args: list[str]) -> None:

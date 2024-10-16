@@ -129,6 +129,8 @@ def handle_game_end_and_forfeit(message, username, all_users, room_name, all_roo
                 p.get_socket().send(message)
             except Exception as e:
                 print("Something went wrong")
+    for p in room.get_viewers() + room.get_players():
+        p.set_room(None)
     del all_rooms[room_name]
     return True
 
