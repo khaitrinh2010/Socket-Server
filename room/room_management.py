@@ -20,7 +20,7 @@ def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
         sock.send("JOIN:ACKSTATUS:2".encode('ascii'))
         return
     user_to_be_added = all_users[username]
-    if(mode == "PLAYER"):
+    if mode == "PLAYER":
         all_rooms[room_name].add_player(user_to_be_added)
     elif mode == "VIEWER":
         all_rooms[room_name].add_viewer(user_to_be_added)

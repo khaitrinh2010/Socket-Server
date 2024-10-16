@@ -17,6 +17,8 @@ def handle_begin(all_rooms, socket_to_user):
                     if user_socket:
                         try:
                             user_socket.send(begin_message)
+                            if room.get_cache():
+                                handle_board_status(room)
                             sent_participants.add(participant)
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
@@ -59,7 +61,6 @@ def handle_place(message, username, all_users, room_name, all_rooms):
     if len(room.get_players()) < 2:
         room.set_cache(["X", x, y])
         room.set_current_turn(None)
-        CACHED = True
         return
 
     if all_users[username] == room.get_current_turn():
@@ -67,7 +68,9 @@ def handle_place(message, username, all_users, room_name, all_rooms):
             game.place("X", x, y)
         else:
             game.place("O", x, y)
-        room.switch_turn()
+        if len(room.get_players()) == 2:
+            room.switch_turn()
+
 
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
         handle_board_status(all_rooms[room_name])
