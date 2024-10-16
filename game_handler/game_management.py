@@ -21,7 +21,7 @@ def handle_begin(all_rooms, socket_to_user):
                             sent_participants.add(participant)
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
-            #handle_board_status(room)
+            handle_board_status(room)
 
 
 def handle_in_progress(room):
