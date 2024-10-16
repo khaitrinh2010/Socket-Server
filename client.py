@@ -41,7 +41,7 @@ def listen_to_message_from_server(client_socket):
             break
         except BrokenPipeError:
             sys.stderr.write("BrokenPipeError: Lost connection to the server.\n")
-            close_socket(client_socket)
+            close_socket(client_socket) #
             break
 
 
