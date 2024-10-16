@@ -83,6 +83,8 @@ def init_server(host, port, path):
                     #     socket_list.remove(sock)
                     #     sock.shutdown(socket.SHUT_RDWR)
                     #     continue
+                    if not message:
+                        handle_disconnect(sock)
                     if message:
                         handle_client_message(message.strip(), path, sock)
                 # except Exception as e:
