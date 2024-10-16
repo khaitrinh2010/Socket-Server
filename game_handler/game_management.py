@@ -63,21 +63,13 @@ def handle_place(message, username, all_users, room_name, all_rooms):
         room.set_current_turn(None)
         CACHED = True
         return
-    if not CACHED:
+
+    if all_users[username] == room.get_current_turn():
         if room.is_play_first(all_users[username]):
             game.place("X", x, y)
-            room.switch_turn()
         else:
             game.place("O", x, y)
-            room.switch_turn()
-    else:
-        if room.is_play_first(all_users[username]):
-            game.place("O", x, y)
-            room.switch_turn()
-        else:
-            game.place("X", x, y)
-            room.switch_turn()
-        CACHED = False
+        room.switch_turn()
 
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
         handle_board_status(all_rooms[room_name])
