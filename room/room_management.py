@@ -51,7 +51,7 @@ def create_room(message, all_rooms, sock, username, all_users):
     if room_name in all_rooms.keys():
         sock.send("CREATE:ACKSTATUS:2".encode('ascii'))
         return
-    if not is_valid_room(room_name):
+    if not is_valid_room(room_name): #
         sock.send("CREATE:ACKSTATUS:1".encode('ascii'))
         return
     if len(message) != 2:
