@@ -112,17 +112,7 @@ def handle_disconnect(sock):
         room = foundUser.get_room()
         another_user = room.get_players()[0] if room.get_players()[0].get_username() != username else \
         room.get_players()[1]
-        board = room.get_game().get_board()
-        res = ""
-        for row in board:
-            for cell in row:
-                if cell == " ":
-                    res += "0"
-                elif cell == "X":
-                    res += "1"
-                else:
-                    res += "2"
-        another_user.get_socket().send(f"GAMEEND:{res}:2:{username}".encode("ascii"))
+        handle_game_end_and_forfeit(["FORFEIT"], username, USERS, room.get_name(), ROOMS)
     else:
         return
 
