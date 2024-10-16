@@ -80,8 +80,9 @@ def init_server(host, port, path):
                     print("siu")
                     handle_disconnect(sock)
                     socket_list.remove(sock)
-                    sock.shutdown(socket.SHUT_RDWR)
-                    sock.close()
+                    if socket_connected(sock):
+                        sock.shutdown(socket.SHUT_RDWR)
+                        sock.close()
                     continue
                 if message:
                     handle_client_message(message.strip(), path, sock)
