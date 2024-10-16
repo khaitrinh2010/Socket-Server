@@ -70,20 +70,21 @@ def init_server(host, port, path):
                 socket_list.append(client_socket)
                 clients[client_socket] = client_address
             else:
-
-                message = sock.recv(8192).decode('ascii')
+                if not socket_connected(sock):
+                    handle_disconnect(sock)
+                    socket_list.remove(sock)
+                    sock.shutdown(socket.SHUT_RDWR)
+                    sock.close()
+                    continue
+                else:
+                    message = sock.recv(8192).decode('ascii')
                     # if not message:
                     #     handle_disconnect(sock)
                     #     socket_list.remove(sock)
                     #     sock.shutdown(socket.SHUT_RDWR)
                     #     continue
-                if not message:
-                    handle_disconnect(sock)
-                    socket_list.remove(sock)
-                    del clients[sock]
-                    sock.close()
-                    continue
-                handle_client_message(message.strip(), path, sock)
+                    if message:
+                        handle_client_message(message.strip(), path, sock)
                 # except Exception as e:
                 #
                 #     socket_list.remove(sock)
@@ -93,7 +94,6 @@ def init_server(host, port, path):
         for sock in exceptional_server:
             socket_list.remove(sock)
             del clients[sock]
-            sock.shutdown(socket.SHUT_RDWR)
             sock.close()
 
 
@@ -110,8 +110,20 @@ def handle_disconnect(sock):
     foundUser = USERS[username]
     if foundUser.get_room():
         room = foundUser.get_room()
-        if room:
-            handle_game_end_and_forfeit(["FORFEIT"], username, USERS, room.get_name(), ROOMS)
+        another_user = room.get_players()[0] if room.get_players()[0].get_username() != username else \
+        room.get_players()[1]
+        board = room.get_game().get_board()
+        res = ""
+        for row in board:
+            for cell in row:
+                if cell == " ":
+                    res += "0"
+                elif cell == "X":
+                    res += "1"
+                else:
+                    res += "2"
+        another_user.get_socket().send(f"GAMEEND:{res}:2:{username}".encode("ascii"))
+
 
 def main(args: list[str]) -> None:
     # Begin here!
@@ -126,9 +138,8 @@ def main(args: list[str]) -> None:
         PORT = data['port']
         DATABASE_PATH = os.path.expanduser(data['userDatabase'])
     load_users_from_file(DATABASE_PATH)
-    init_server('0.0.0.0', PORT, DATABASE_PATH)
+    init_server('0.0.0.0', PORT, DATABASE_PATH) #
 
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
