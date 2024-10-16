@@ -9,6 +9,7 @@ def handle_begin(all_rooms, socket_to_user):
         if len(players) == 2:
             player1, player2 = players
             begin_message = f"BEGIN:{player1.get_username()}:{player2.get_username()}".encode('ascii')
+            room.set_started(True)
             sent_participants = set()
             for participant in players + room.get_viewers():
                 if participant not in sent_participants:
