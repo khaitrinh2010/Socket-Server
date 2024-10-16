@@ -1,7 +1,7 @@
 import re
 
 from model.Room import Room
-from game_handler.game_management import handle_begin
+from game_handler.game_management import handle_begin, handle_in_progress, handle_board_status
 from game import Game
 
 def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
@@ -36,6 +36,8 @@ def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
     sock.send("JOIN:ACKSTATUS:0".encode('ascii'))
     if len(all_rooms[room_name].get_players()) == 2:
         handle_begin(all_rooms, socket_to_user)
+        handle_in_progress(all_rooms[room_name])
+
 
 
 def create_room(message, all_rooms, sock, username, all_users):
