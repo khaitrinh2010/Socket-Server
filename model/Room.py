@@ -41,7 +41,7 @@ class Room:
     def get_cache(self):
         return self.cache
     def set_cache(self, cache):
-        self.cache = cache
+        self.cache.append(cache)
     def set_cache_status(self, status):
         self.is_cache = status
     def get_cache_status(self):

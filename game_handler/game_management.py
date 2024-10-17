@@ -17,7 +17,7 @@ def handle_begin(all_rooms, socket_to_user):
                     if user_socket:
                         try:
                             user_socket.send(begin_message)
-                            if room.get_cache():
+                            if room.get_cache() and user_socket == player1.get_socket():
                                 user_socket.send(f"BOARDSTATUS:{get_board_status(room)}".encode('ascii'))
                             sent_participants.add(participant)
                         except Exception as e:
@@ -37,6 +37,7 @@ def get_board_status(room):
             else:
                 res += "2"
     return res
+
 def handle_in_progress(room):
     for viewers in room.get_viewers():
         current_player = room.get_current_turn().get_username()
@@ -74,6 +75,10 @@ def handle_place(message, username, all_users, room_name, all_rooms):
         room.set_cache(["X", x, y])
         room.set_current_turn(None)
         return
+    if room.get_cache():
+        cache = room.get_cache()[0]
+        game.place(cache[0], cache[1], cache[2])
+        room.get_cache().pop(0)
 
     if all_users[username] == room.get_current_turn():
         if room.is_play_first(all_users[username]):
@@ -82,6 +87,11 @@ def handle_place(message, username, all_users, room_name, all_rooms):
             game.place("O", x, y)
         if len(room.get_players()) == 2:
             room.switch_turn()
+    else:
+        if room.is_play_first(all_users[username]):
+            room.set_cache(["X", x, y])
+        else:
+            room.set_cache(["O", x, y])
 
 
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
