@@ -17,7 +17,7 @@ def handle_begin(all_rooms, socket_to_user):
                     if user_socket:
                         try:
                             user_socket.send(begin_message)
-                            if room.get_cache() and user_socket == player1.get_socket():
+                            if room.get_cache():
                                 user_socket.send(f"BOARDSTATUS:{get_board_status(room)}".encode('ascii'))
                             sent_participants.add(participant)
                         except Exception as e:
@@ -68,35 +68,40 @@ def handle_place(message, username, all_users, room_name, all_rooms):
     global CACHED
     room = all_rooms[room_name]
     game = room.get_game()
+    cache_player = None
 
     x, y = int(message[1]), int(message[2])
 
     if len(room.get_players()) < 2:
-        room.set_cache(["X", x, y])
+        room.set_cache(["X", x, y, room.get_players()[0]]) # Who makes the cache move
         room.set_current_turn(None)
         return
+
     if room.get_cache():
         cache = room.get_cache()[0]
         game.place(cache[0], cache[1], cache[2])
         room.get_cache().pop(0)
+        cache_player = cache[3]
 
-
-    if all_users[username] == room.get_current_turn():
-        if room.is_play_first(all_users[username]):
-            game.place("X", x, y)
-        else:
-            game.place("O", x, y)
-        if len(room.get_players()) == 2:
-            room.switch_turn()
+    if not cache_player == all_users[username]:
+        if all_users[username] == room.get_current_turn():
+            if room.is_play_first(all_users[username]):
+                game.place("X", x, y)
+            else:
+                game.place("O", x, y)
+            if len(room.get_players()) == 2:
+                room.switch_turn()
     else:
         if room.is_play_first(all_users[username]):
-            room.set_cache(["X", x, y])
+            room.set_cache(["X", x, y, all_users[username]])
         else:
-            room.set_cache(["O", x, y])
+            room.set_cache(["O", x, y, all_users[username]])
+        room.switch_turn()
 
 
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
-        handle_board_status(all_rooms[room_name])
+        if all_users[username] == room.get_current_turn():
+            handle_board_status(all_rooms[room_name])
 
 def handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
 
