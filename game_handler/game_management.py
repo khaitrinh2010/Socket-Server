@@ -23,6 +23,8 @@ def handle_begin(all_rooms, socket_to_user):
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
             #handle_board_status(room)
+        if room.get_cache():
+            room.get_cache().pop(0)
 
 def get_board_status(room):
     game = room.get_game()
@@ -71,18 +73,31 @@ def handle_place(message, username, all_users, room_name, all_rooms):
     x, y = int(message[1]), int(message[2])
 
     if len(room.get_players()) < 2:
-        room.set_cache(["X", x, y])
+        room.set_cache(["X", x, y, room.get_players()[0]])
         room.set_current_turn(None)
         return
 
     if all_users[username] == room.get_current_turn():
-        if room.is_play_first(all_users[username]):
-            game.place("X", x, y)
+        if not room.get_cache() or room.get_cache()[0][3] != room.get_current_turn():
+            if room.is_play_first(all_users[username]):
+                game.place("X", x, y)
+            else:
+                game.place("O", x, y)
+            if len(room.get_players()) == 2:
+                room.switch_turn()
         else:
-            game.place("O", x, y)
-        if len(room.get_players()) == 2:
-            room.switch_turn()
+            cache = room.get_cache()[0]
+            game.place(cache[0], cache[1], cache[2])
+            if cache[3] == room.get_current_turn():
+                game.place(cache[0], cache[1], cache[2])
+                room.switch_turn()
 
+    else:
+        if room.is_play_first(all_users[username]):
+            room.set_cache(["X", x, y, room.get_players()[0]])
+        else:
+            room.set_cache(["O", x, y, room.get_players()[1]])
+        return
 
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
         handle_board_status(all_rooms[room_name])
