@@ -102,7 +102,8 @@ def handle_place(message, username, all_users, room_name, all_rooms):
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
         handle_board_status(all_rooms[room_name])
         if room.get_cache() and room.get_cache()[0][3] == room.get_current_turn():
-            handle_place(f"PLACE:{room.get_cache()[0][1]}:{room.get_cache()[0][2]}.", room.get_current_turn().get_username(), all_users, room_name, all_rooms)
+            next_msg = f"PLACE:{room.get_cache()[0][1]}:{room.get_cache()[0][2]}".split(":")
+            handle_place(f"{next_msg}", room.get_current_turn().get_username(), all_users, room_name, all_rooms)
 
 def handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
 
