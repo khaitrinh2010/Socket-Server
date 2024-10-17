@@ -80,6 +80,7 @@ def handle_place(message, username, all_users, room_name, all_rooms):
         game.place(cache[0], cache[1], cache[2])
         room.get_cache().pop(0)
 
+
     if all_users[username] == room.get_current_turn():
         if room.is_play_first(all_users[username]):
             game.place("X", x, y)

@@ -114,8 +114,6 @@ def handle_outside_input(client_socket):
     while True:
         if WAITING_FOR_PLAYER:
             continue
-        if IS_PLAYER and not IS_TURN:
-            continue
         try:
             message = input()
             print(message)
