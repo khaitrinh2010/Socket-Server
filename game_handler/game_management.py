@@ -96,7 +96,7 @@ def handle_place(message, username, all_users, room_name, all_rooms):
         if room.is_play_first(all_users[username]):
             room.set_cache(["X", x, y, room.get_players()[0]])
         else:
-            room.set_cache(["O", x, y, room.get_players()[1]])
+            room.set_cache(["O", x, y, room.get_players()[1]]) #
         return
 
     if not handle_game_end_and_forfeit(message, username, all_users, room_name, all_rooms):
