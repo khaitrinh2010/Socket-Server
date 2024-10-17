@@ -87,9 +87,9 @@ def handle_place(message, username, all_users, room_name, all_rooms):
                 room.switch_turn()
         else:
             cache = room.get_cache()[0]
-            game.place(cache[0], cache[1], cache[2])
             if cache[3] == room.get_current_turn():
                 game.place(cache[0], cache[1], cache[2])
+                room.get_cache().pop(0)
                 room.switch_turn()
 
     else:
