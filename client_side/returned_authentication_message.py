@@ -30,3 +30,4 @@ def handle_return_register(response: str, username):
         return f"Successfully created user account {username}"
     elif status == "1":
         return f"Error: User {username} already exists"
+    return ""
