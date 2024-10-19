@@ -30,7 +30,7 @@ def connect_to_server(host, port):
 
 def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER, RUNNING
-    while True:
+    while RUNNING:
         try:
             response = client_socket.recv(8192).decode('ascii')
             if not response:
@@ -117,6 +117,7 @@ def handle_outside_input(client_socket):
             print(message)
         except EOFError:
             sys.stdout.write("\nEnd of input detected. Shutting down...\n")
+            RUNNING = False
             break
         if message == "LOGIN":
             handle_login(client_socket)
@@ -189,9 +190,10 @@ def handle_create(client_socket):
 
 
 def handle_join(client_socket):
-    global ROOM_NAME, MODE
+    global ROOM_NAME, MODE, IS_PLAYER
     ROOM_NAME = input("Enter room name to join: ").strip()
     MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
+    IS_PLAYER = MODE == "PLAYER"
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
 
