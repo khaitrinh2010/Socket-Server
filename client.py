@@ -75,7 +75,7 @@ def process_server_message(response):
             WAITING_FOR_PLAYER = True
             IS_PLAYER = True
         else:
-            sys.stdout.write(handle_returned_create(response, ROOM_NAME) + "\n")
+            sys.stdout.write("Failed to create room.\n")
     elif response.startswith("JOIN"):
         status = response.split(":")[2]
         if status == "0":
@@ -110,8 +110,8 @@ def process_server_message(response):
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN, RUNNING
     while True:
-        # if WAITING_FOR_PLAYER:
-        #     continue
+        if WAITING_FOR_PLAYER:
+            continue
         try:
             message = input()
             print(message)
@@ -144,9 +144,6 @@ def handle_forfeit(client_socket):
 
 
 def execute_place_client(client_socket):
-    if not IS_PLAYER:
-        sys.stdout.write("You are not a player in this room.\n")
-        return
     col = input("Column: ")
     row = input("Row: ")
     while True:
@@ -190,10 +187,9 @@ def handle_create(client_socket):
 
 
 def handle_join(client_socket):
-    global ROOM_NAME, MODE, IS_PLAYER
+    global ROOM_NAME, MODE
     ROOM_NAME = input("Enter room name to join: ").strip()
     MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
-    IS_PLAYER = MODE == "PLAYER"
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
 
