@@ -48,7 +48,7 @@ def handle_login(message, path, sock, all_users):
         sock.send("LOGIN:ACKSTATUS:0".encode('ascii'))
         return username
     else:
-        sock.send("LOGIN:ACKSTATUS:2")
+        sock.send("LOGIN:ACKSTATUS:2".encode('ascii'))
         return None
 
 

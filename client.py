@@ -50,7 +50,7 @@ def listen_to_message_from_server(client_socket):
 def process_server_message(response):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN, RUNNING, HAVE_PLACED
     sys.stdout.write("\r" + " " * 80 + "\r") #
-
+    print(response)
     if response.startswith("LOGIN"):
         sys.stdout.write(handle_return_login(response, USERNAME) + "\n")
     elif response.startswith("REGISTER"):
