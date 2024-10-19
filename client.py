@@ -75,7 +75,7 @@ def process_server_message(response):
             WAITING_FOR_PLAYER = True
             IS_PLAYER = True
         else:
-            sys.stdout.write("Failed to create room.\n")
+            sys.stdout.write(handle_returned_create(response, ROOM_NAME) + "\n")
     elif response.startswith("JOIN"):
         status = response.split(":")[2]
         if status == "0":
@@ -99,8 +99,8 @@ def process_server_message(response):
             sys.stdout.write("It is the opponent's turn.\n")
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
-        RUNNING = False
         WAITING_FOR_PLAYER = False
+        RUNNING = False  # End game gracefully
     else:
         try:
             sys.stdout.write(response)
@@ -118,7 +118,6 @@ def handle_outside_input(client_socket):
             print(message)
         except EOFError:
             sys.stdout.write("\nEnd of input detected. Shutting down...\n")
-            RUNNING = False
             break
         if message == "LOGIN":
             handle_login(client_socket)
