@@ -22,7 +22,7 @@ def handle_return_login(response: str, username):
         return "Unknown error during login process"
 
 def handle_return_register(response: str, username):
-    bad_auth_msg = check_bad_auth(response) #
+    bad_auth_msg = check_bad_auth(response)
     if bad_auth_msg:
         return bad_auth_msg
     status = response.split(":")[2]
