@@ -30,7 +30,7 @@ def connect_to_server(host, port):
 
 def listen_to_message_from_server(client_socket):
     global WAITING_FOR_PLAYER, RUNNING
-    while RUNNING:
+    while True:
         try:
             response = client_socket.recv(8192).decode('ascii')
             if not response:
@@ -75,7 +75,7 @@ def process_server_message(response):
             WAITING_FOR_PLAYER = True
             IS_PLAYER = True
         else:
-            sys.stdout.write("Failed to create room.\n")
+            sys.stdout.write(handle_returned_create(response, ROOM_NAME) + "\n")
     elif response.startswith("JOIN"):
         status = response.split(":")[2]
         if status == "0":
@@ -100,7 +100,6 @@ def process_server_message(response):
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
         WAITING_FOR_PLAYER = False
-        RUNNING = False  # End game gracefully
     else:
         try:
             sys.stdout.write(response)
@@ -111,8 +110,8 @@ def process_server_message(response):
 def handle_outside_input(client_socket):
     global WAITING_FOR_PLAYER, IS_PLAYER, IS_TURN, RUNNING
     while True:
-        if WAITING_FOR_PLAYER:
-            continue
+        # if WAITING_FOR_PLAYER:
+        #     continue
         try:
             message = input()
             print(message)
@@ -144,6 +143,9 @@ def handle_forfeit(client_socket):
 
 
 def execute_place_client(client_socket):
+    if not IS_PLAYER:
+        sys.stdout.write("You are not a player in this room.\n")
+        return
     col = input("Column: ")
     row = input("Row: ")
     while True:
