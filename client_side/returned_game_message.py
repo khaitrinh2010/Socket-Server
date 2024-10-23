@@ -2,7 +2,7 @@ import sys
 
 
 def handle_return_in_progress(message):
-    message = message.split(":")
+    message = message.strip().split(":")
     player1, player2 = message[1], message[2]
     return f"Match between {player1} and {player2} is in progress, it is currently {player1}'s turn."
 
@@ -22,7 +22,7 @@ def handle_return_board_status(message):
     return formatted_board
 
 def handle_return_game_end(message, is_player, username):
-    message = message.split(":")
+    message = message.strip().split(":")
     board = message[1]
     status = message[2]
     winner = message[3]

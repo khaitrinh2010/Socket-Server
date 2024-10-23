@@ -4,7 +4,7 @@ def handle_returned_create(message, room_name):
     bad_auth_msg = check_bad_auth(message)
     if bad_auth_msg:
         return bad_auth_msg
-    status = message.split(":")[2]
+    status = message.strip().split(":")[2]
     if status == "0":
         return f"Successfully created room name {room_name}\nWaiting for other players"
     elif status == "1":
@@ -19,7 +19,7 @@ def handle_returned_join(message, room_name, mode):
     bad_auth_msg = check_bad_auth(message)
     if bad_auth_msg:
         return bad_auth_msg
-    status = message.split(":")[2]
+    status = message.strip().split(":")[2]
     if status == "0":
         return f"Successfully joined room {room_name} as a {mode}"
     elif status == "1":
@@ -33,7 +33,7 @@ def handle_returned_room_list(message, mode):
     bad_auth_msg = check_bad_auth(message)
     if bad_auth_msg:
         return bad_auth_msg
-    status = message.split(":")[2]
+    status = message.strip().split(":")[2]
     if len(message.split(":")) == 4:
         room_list = message.split(":")[3]
     if status == "0":

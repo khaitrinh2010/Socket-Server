@@ -19,6 +19,7 @@ IS_TURN = None
 WAITING_FOR_OPPONENT = False  # WAIT FOR OPPONENT TO MOVE
 RUNNING = True
 HAVE_PLACED = False
+BOARD = " " * 9
 
 
 def connect_to_server(host, port):
@@ -48,7 +49,7 @@ def listen_to_message_from_server(client_socket):
 
 
 def process_server_message(response):
-    global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN, RUNNING, HAVE_PLACED
+    global WAITING_FOR_PLAYER, IS_PLAYER, IS_VIEWER, MODE, IS_TURN, RUNNING, HAVE_PLACED, BOARD
     sys.stdout.write("\r" + " " * 80 + "\r") #
     print(response)
     if response.startswith("LOGIN"):
@@ -90,6 +91,7 @@ def process_server_message(response):
     elif response.startswith("BADAUTH"):
         sys.stdout.write("Error: You must log in to perform this action\n")
     elif response.startswith("BOARDSTATUS"):
+        BOARD = response.strip().split(":")[1]
         sys.stdout.write(handle_return_board_status(response) + "\n")
         if IS_TURN is not None:
             IS_TURN = not IS_TURN
@@ -152,6 +154,10 @@ def execute_place_client(client_socket):
             print(f"row: {row}, col: {col}")
             col = input("Column: ")
             row = input("Row: ")
+        elif BOARD[int(row) * 3 + int(col)] != " ":  # Check if the cell is already occupied
+            sys.stdout.write("Error: Cell is already occupied.\n")
+            col = input("Column: ")
+            row = input("Row: ")
         else:
             break
     client_socket.send(f"PLACE:{col}:{row}".encode('ascii'))
@@ -168,7 +174,14 @@ def handle_login(client_socket):
 def handle_register(client_socket):
     global USERNAME
     username = input("Enter username: ")
+    while len(username) >= 20:
+        sys.stdout.write("Error:username length limitation is 20 characters.\n")
+        username = input("Enter username: ")
     password = input("Enter password: ")
+    while len(password) >= 20:
+        sys.stdout.write("Error:password length limitation is 20 characters.\n")
+        password = input("Enter password: ")
+
     USERNAME = username
     client_socket.send(f"REGISTER:{username}:{password}".encode('ascii'))
 
@@ -176,7 +189,9 @@ def handle_register(client_socket):
 def handle_room_list(client_socket):
     global MODE
     MODE = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
-    m = f"ROOMLIST:{MODE}"
+    while MODE not in ["PLAYER", "VIEWER"]:
+        sys.stdout.write("Error: Please input a valid mode\n")
+        MODE = input("Do you want to list rooms as Player or Viewer? ").strip().upper()
     client_socket.send(f"ROOMLIST:{MODE}".encode('ascii'))
 
 
@@ -190,6 +205,9 @@ def handle_join(client_socket):
     global ROOM_NAME, MODE
     ROOM_NAME = input("Enter room name to join: ").strip()
     MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
+    while MODE not in ["PLAYER", "VIEWER"]:
+        sys.stdout.write("Unknown input\n")
+        MODE = input("Do you want to join as Player or Viewer? ").strip().upper()
     client_socket.send(f"JOIN:{ROOM_NAME}:{MODE}".encode('ascii'))
 
 
