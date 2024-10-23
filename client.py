@@ -77,7 +77,7 @@ def process_server_message(response):
         else:
             sys.stdout.write(handle_returned_create(response, ROOM_NAME) + "\n")
     elif response.startswith("JOIN"):
-        status = response.split(":")[2]
+        status = response.split(":")[2].strip()
         if status == "0":
             if MODE == "PLAYER":
                 IS_PLAYER = True
@@ -95,7 +95,7 @@ def process_server_message(response):
             IS_TURN = not IS_TURN
         if IS_PLAYER and IS_TURN:
             sys.stdout.write("It is your turn.\n")
-        elif IS_PLAYER and not IS_TURN:
+        if IS_PLAYER and not IS_TURN:
             sys.stdout.write("It is the opponent's turn.\n")
     elif response.startswith("GAMEEND"):
         sys.stdout.write(handle_return_game_end(response, IS_PLAYER, USERNAME) + "\n")
