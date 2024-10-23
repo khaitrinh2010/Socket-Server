@@ -61,7 +61,6 @@ def init_server(host, port, path):
     server.listen(5)
     server.setblocking(False)
     socket_list = [server]
-    clients = {}
     while True:
         read_server, _, exceptional_server = select.select(socket_list, [], socket_list)
         for sock in read_server:
@@ -69,7 +68,6 @@ def init_server(host, port, path):
                 client_socket, client_address = server.accept()
                 client_socket.setblocking(False)
                 socket_list.append(client_socket)
-                clients[client_socket] = client_address
             else:
                 message = sock.recv(8192).decode('ascii')
                 # if not message:
@@ -95,7 +93,6 @@ def init_server(host, port, path):
                 #     sock.close()
         for sock in exceptional_server:
             socket_list.remove(sock)
-            del clients[sock]
             sock.close()
 
 
