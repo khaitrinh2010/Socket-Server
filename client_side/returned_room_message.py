@@ -34,10 +34,11 @@ def handle_returned_room_list(message, mode):
     if bad_auth_msg:
         return bad_auth_msg
     status = message.split(":")[2]
-    room_list = message.split(":")[3]
+    if len(message.split(":")) == 4:
+        room_list = message.split(":")[3]
     if status == "0":
         return f"Room available to join as {mode}: {room_list}"
     elif status == "1":
-        return "ClientError: Please input a valid mode"
+        return "Error: Please input a valid mode"
     else:
         return ""

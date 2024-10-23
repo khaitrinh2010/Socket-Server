@@ -34,9 +34,10 @@ def handle_client_message(message, path, sock:socket):
     global LOGIN
     message = message.strip()
     components = message.split(":")
+    print(components)
     if components[0] == "LOGIN" or components[0] == "REGISTER":
         username = handle_authentication_message(message, path, sock, USERS)
-        if components[0] == "LOGIN":
+        if components[0] == "LOGIN" and username:
             SOCKET_TO_USER[sock] = username
     else:
         if not SOCKET_TO_USER.get(sock):

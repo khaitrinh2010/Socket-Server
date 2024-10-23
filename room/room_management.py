@@ -44,6 +44,9 @@ def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
 
 
 def create_room(message, all_rooms, sock, username, all_users):
+    if len(message) != 2:
+        sock.send("CREATE:ACKSTATUS:4".encode('ascii'))
+        return
     room_name = message[1]
     if len(all_rooms.keys()) >= 256:
         sock.send("CREATE:ACKSTATUS:3".encode('ascii'))
@@ -54,9 +57,7 @@ def create_room(message, all_rooms, sock, username, all_users):
     if not is_valid_room(room_name): #
         sock.send("CREATE:ACKSTATUS:1".encode('ascii'))
         return
-    if len(message) != 2:
-        sock.send("CREATE:ACKSTATUS:4".encode('ascii'))
-        return
+
 
     room_to_add = Room(room_name, [], [], Game())
     room_to_add.add_player(all_users[username])
