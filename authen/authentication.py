@@ -36,7 +36,7 @@ def handle_login(message, path, sock, all_users):
     password = message[2]
     user = find_by_username(username, path)
     if not user:
-        sock.send("LOGIN:ACKSTATUS:1".encode('ascii'))
+        sock.send("LOGIN:ACKSTATUS:1\n".encode('ascii'))
         return None
     if bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
         try:
@@ -45,17 +45,17 @@ def handle_login(message, path, sock, all_users):
             foundUser.set_socket(sock)
         except Exception as e:
             print(e)
-        sock.send("LOGIN:ACKSTATUS:0".encode('ascii'))
+        sock.send("LOGIN:ACKSTATUS:0\n".encode('ascii'))
         return username
     else:
-        sock.send("LOGIN:ACKSTATUS:2".encode('ascii'))
+        sock.send("LOGIN:ACKSTATUS:2\n".encode('ascii'))
         return None
 
 
 def handle_register(message, path, sock, all_users):
     username, password = message[1], message[2]
     if find_by_username(username, path):
-        sock.send("REGISTER:ACKSTATUS:1".encode('ascii'))
+        sock.send("REGISTER:ACKSTATUS:1\n".encode('ascii'))
         return
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     save_user(username, hashed_password, path)
@@ -63,4 +63,4 @@ def handle_register(message, path, sock, all_users):
     #CREATE AND SAVE A NEW USER
     new_user = User(username, hashed_password)
     all_users[username] = new_user
-    sock.send("REGISTER:ACKSTATUS:0".encode('ascii'))
+    sock.send("REGISTER:ACKSTATUS:0\n".encode('ascii'))

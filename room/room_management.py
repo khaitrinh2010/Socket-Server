@@ -6,18 +6,18 @@ from game import Game
 
 def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
     if len(message) != 3:
-        sock.send("JOIN:ACKSTATUS:3".encode('ascii'))
+        sock.send("JOIN:ACKSTATUS:3\n".encode('ascii'))
         return
     mode = message[2]
     room_name = message[1]
     if mode not in ["PLAYER", "VIEWER"]:
-        sock.send("JOIN:ACKSTATUS:3".encode('ascii'))
+        sock.send("JOIN:ACKSTATUS:3\n".encode('ascii'))
         return
     if not room_name in all_rooms:
-        sock.send("JOIN:ACKSTATUS:1".encode('ascii'))
+        sock.send("JOIN:ACKSTATUS:1\n".encode('ascii'))
         return
     if mode == "PLAYER" and len(all_rooms[room_name].get_players()) >= 2:
-        sock.send("JOIN:ACKSTATUS:2".encode('ascii'))
+        sock.send("JOIN:ACKSTATUS:2\n".encode('ascii'))
         return
     user_to_be_added = all_users[username]
     if mode == "PLAYER":
@@ -45,17 +45,17 @@ def join_room(message, all_rooms, all_users, username, socket_to_user, sock):
 
 def create_room(message, all_rooms, sock, username, all_users):
     if len(message) != 2:
-        sock.send("CREATE:ACKSTATUS:4".encode('ascii'))
+        sock.send("CREATE:ACKSTATUS:4\n".encode('ascii'))
         return
     room_name = message[1]
     if len(all_rooms.keys()) >= 256:
-        sock.send("CREATE:ACKSTATUS:3".encode('ascii'))
+        sock.send("CREATE:ACKSTATUS:3\n".encode('ascii'))
         return
     if room_name in all_rooms.keys():
-        sock.send("CREATE:ACKSTATUS:2".encode('ascii'))
+        sock.send("CREATE:ACKSTATUS:2\n".encode('ascii'))
         return
     if not is_valid_room(room_name): #
-        sock.send("CREATE:ACKSTATUS:1".encode('ascii'))
+        sock.send("CREATE:ACKSTATUS:1\n".encode('ascii'))
         return
 
 
@@ -64,16 +64,16 @@ def create_room(message, all_rooms, sock, username, all_users):
     room_to_add.set_current_turn(all_users[username])
     all_users[username].set_room(room_to_add)
     all_rooms[room_name] = room_to_add
-    sock.send("CREATE:ACKSTATUS:0".encode('ascii'))
+    sock.send("CREATE:ACKSTATUS:0\n".encode('ascii'))
 
 
 def room_list(all_rooms, message, sock):
     if(len(message) != 2):
-        sock.send("ROOMLIST:ACKSTATUS:1".encode('ascii'))
+        sock.send("ROOMLIST:ACKSTATUS:1\n".encode('ascii'))
         return
     mode = message[1]
     if mode not in ["PLAYER", "VIEWER"]:
-        sock.send("ROOMLIST:ACKSTATUS:1".encode('ascii'))
+        sock.send("ROOMLIST:ACKSTATUS:1\n".encode('ascii'))
         return
     mode = mode.upper()
     rooms_available = []
@@ -85,9 +85,9 @@ def room_list(all_rooms, message, sock):
             rooms_available.append(room_name)
     if len(rooms_available) > 0:
         rooms = ",".join(rooms_available)
-        sock.send(f"ROOMLIST:ACKSTATUS:0:{rooms}".encode('ascii'))
+        sock.send(f"ROOMLIST:ACKSTATUS:0:{rooms}\n".encode('ascii'))
     else:
-        sock.send("ROOMLIST:ACKSTATUS:0:".encode('ascii'))
+        sock.send("ROOMLIST:ACKSTATUS:0:\n".encode('ascii'))
 
 
 def is_valid_room(room_name):

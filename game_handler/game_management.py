@@ -18,7 +18,7 @@ def handle_begin(all_rooms, socket_to_user):
                         try:
                             user_socket.send(begin_message)
                             if room.get_cache():
-                                user_socket.send(f"BOARDSTATUS:{get_board_status(room)}".encode('ascii'))
+                                user_socket.send(f"BOARDSTATUS:{get_board_status(room)}\n".encode('ascii'))
                             sent_participants.add(participant)
                         except Exception as e:
                             print(f"Failed to send BEGIN message to {participant.get_username()}: {e}")
@@ -43,7 +43,7 @@ def handle_in_progress(room):
     for viewers in room.get_viewers():
         current_player = room.get_current_turn().get_username()
         next_player = room.get_next_turn().get_username()
-        viewers.get_socket().send(f"INPROGRESS:{current_player}:{next_player}".encode('ascii'))
+        viewers.get_socket().send(f"INPROGRESS:{current_player}:{next_player}\n".encode('ascii'))
 
 def handle_board_status(room):
     game = room.get_game()
@@ -148,14 +148,14 @@ def handle_game_end_and_forfeit(message, username, all_users, room_name, all_roo
             return False
     if winner or FORFEIT:
         for p in room.get_viewers() + room.get_players():
-            message = f"GAMEEND:{res}:{STATUS}:{winner.get_username()}".encode("ascii")
+            message = f"GAMEEND:{res}:{STATUS}:{winner.get_username()}\n".encode("ascii")
             try:
                 p.get_socket().send(message)
             except Exception as e:
                 print("Something went wrong")
     elif DRAW:
         for p in room.get_viewers() + room.get_players():
-            message = f"GAMEEND:{res}:1".encode("ascii")
+            message = f"GAMEEND:{res}:1\n".encode("ascii")
             try:
                 p.get_socket().send(message)
             except Exception as e:
