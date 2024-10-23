@@ -146,6 +146,7 @@ def handle_forfeit(client_socket):
 
 
 def execute_place_client(client_socket):
+    global BOARD
     col = input("Column: ")
     row = input("Row: ")
     while True:
