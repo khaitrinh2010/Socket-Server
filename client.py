@@ -19,7 +19,7 @@ IS_TURN = None
 WAITING_FOR_OPPONENT = False  # WAIT FOR OPPONENT TO MOVE
 RUNNING = True
 HAVE_PLACED = False
-BOARD = "0" * 9
+BOARD = "0" * 9 #initial board
 
 
 def connect_to_server(host, port):
