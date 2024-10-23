@@ -19,7 +19,7 @@ IS_TURN = None
 WAITING_FOR_OPPONENT = False  # WAIT FOR OPPONENT TO MOVE
 RUNNING = True
 HAVE_PLACED = False
-BOARD = " " * 9
+BOARD = "0" * 9
 
 
 def connect_to_server(host, port):
@@ -155,7 +155,7 @@ def execute_place_client(client_socket):
             print(f"row: {row}, col: {col}")
             col = input("Column: ")
             row = input("Row: ")
-        elif BOARD[int(row) * 3 + int(col)] != " ":  # Check if the cell is already occupied
+        elif BOARD[int(row) * 3 + int(col)] != '0':  # Check if the cell is already occupied
             sys.stdout.write("Error: Cell is already occupied.\n")
             col = input("Column: ")
             row = input("Row: ")
